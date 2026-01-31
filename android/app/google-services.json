@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "829317271584",
+    "project_id": "biblioteca-unimet",
+    "storage_bucket": "biblioteca-unimet.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:829317271584:android:642ac0ab450da44ac3ac45",
+        "android_client_info": {
+          "package_name": "com.example.biblioteca_unimet"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC9ghhGpCAD35bna1J-VMnntF0P4-zWnzs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
