@@ -1,3 +1,4 @@
+import 'package:biblioteca_unimet/ui/views/donation_view.dart';
 import 'package:flutter/material.dart';
 
 class HomeView extends StatelessWidget {
@@ -29,7 +30,7 @@ class HomeView extends StatelessWidget {
                     children: [
                       _buildHeroSection(isDesktop),
                       const SizedBox(height: 80),
-                      _buildActionSection(isDesktop),
+                      _buildActionSection(context, isDesktop),
                       const SizedBox(height: 60),
                       const Divider(thickness: 1, color: Colors.black12),
                       const SizedBox(height: 60),
@@ -176,11 +177,48 @@ class HomeView extends StatelessWidget {
   }
 
   // Renderiza los bloques de accion rapida (Catalogo, Prestamos, Donaciones)
-  Widget _buildActionSection(bool isDesktop) {
+  Widget _buildActionSection(BuildContext context, bool isDesktop) {
     List<Widget> actions = [
-      _actionBlock(Icons.menu_book, 'Catalogo'),
-      _actionBlock(Icons.bookmark_added, 'Gestion y Prestamos'),
-      _actionBlock(Icons.volunteer_activism, 'Donaciones'),
+      _actionBlock(Icons.menu_book, 'Catalogo', () {}),
+      _actionBlock(Icons.bookmark_added, 'Gestion y Prestamos', () {}),
+      _actionBlock(Icons.volunteer_activism, 'Donaciones', () {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15),
+              ),
+              title: const Text('Redirección a página de pagos'),
+              content: const Text(
+                'Está a punto de ser redirigido a la plataforma de PayPal para continuar con su donación.',
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context), // Cierra el pop-up
+                  child: const Text(
+                    'Cancelar',
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(backgroundColor: kOrange),
+                  onPressed: () {
+                    Navigator.pop(context); 
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const DonationView(),
+                      ),
+                    );
+                  },
+                  child: const Text('Continuar'),
+                ),
+              ],
+            );
+          },
+        );
+      }),
     ];
 
     if (isDesktop) {
@@ -210,7 +248,7 @@ class HomeView extends StatelessWidget {
   }
 
   // Crea el diseno individual de cada boton de accion con su icono
-  Widget _actionBlock(IconData icon, String title) {
+  Widget _actionBlock(IconData icon, String title, VoidCallback onTap) {
     return Column(
       children: [
         Icon(icon, size: 60, color: Colors.black),
@@ -225,7 +263,7 @@ class HomeView extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
-            onPressed: () {},
+            onPressed: onTap,
             child: Text(
               title,
               style: const TextStyle(
