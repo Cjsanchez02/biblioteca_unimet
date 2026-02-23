@@ -1,6 +1,7 @@
 import 'package:biblioteca_unimet/ui/views/donation_view.dart';
 import 'package:flutter/material.dart';
 import 'package:biblioteca_unimet/viewmodels/auth_viewmodel.dart';
+import 'package:biblioteca_unimet/ui/views/edit_profile_view.dart';
 
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
@@ -73,7 +74,15 @@ class HomeView extends StatelessWidget {
                 _navItem('Inicio', () {}),
                 _navItem('Servicios', () {}),
                 _navItem('Contactanos', () {}),
-                _navItem('Nosotros', () {}),
+                _navItem('Editar Perfil', () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const EditProfileView(),
+                    ),
+                  );
+                }),
+
                 _navItem('Cerrar Sesión', () {
                   showDialog(
                     context: context,
@@ -81,8 +90,7 @@ class HomeView extends StatelessWidget {
                       return _dialogoCerrarSesion(context);
                     },
                   );
-                }
-                ),
+                }),
               ],
             )
           else
@@ -442,7 +450,10 @@ class HomeView extends StatelessWidget {
             final vm = AuthViewModel();
             await vm.cerrarSesion(context);
           },
-          child: const Text('Cerrar Sesión', style: TextStyle(color: Colors.black),),
+          child: const Text(
+            'Cerrar Sesión',
+            style: TextStyle(color: Colors.black),
+          ),
         ),
       ],
     );
