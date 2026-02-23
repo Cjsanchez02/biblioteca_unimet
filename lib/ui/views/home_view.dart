@@ -1,5 +1,6 @@
 import 'package:biblioteca_unimet/ui/views/donation_view.dart';
 import 'package:flutter/material.dart';
+import 'package:biblioteca_unimet/viewmodels/auth_viewmodel.dart';
 
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
@@ -20,7 +21,7 @@ class HomeView extends StatelessWidget {
           return SingleChildScrollView(
             child: Column(
               children: [
-                _buildNavbar(isDesktop),
+                _buildNavbar(isDesktop, context),
                 const SizedBox(height: 40),
                 Padding(
                   padding: EdgeInsets.symmetric(
@@ -48,7 +49,7 @@ class HomeView extends StatelessWidget {
   }
 
   // Genera la barra de navegacion superior
-  Widget _buildNavbar(bool isDesktop) {
+  Widget _buildNavbar(bool isDesktop, BuildContext context) {
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: isDesktop ? 80.0 : 20.0,
@@ -69,10 +70,19 @@ class HomeView extends StatelessWidget {
           if (isDesktop)
             Row(
               children: [
-                _navItem('Inicio'),
-                _navItem('Servicios'),
-                _navItem('Contactanos'),
-                _navItem('Nosotros'),
+                _navItem('Inicio', () {}),
+                _navItem('Servicios', () {}),
+                _navItem('Contactanos', () {}),
+                _navItem('Nosotros', () {}),
+                _navItem('Cerrar Sesión', () {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return _dialogoCerrarSesion(context);
+                    },
+                  );
+                }
+                ),
               ],
             )
           else
@@ -83,15 +93,18 @@ class HomeView extends StatelessWidget {
   }
 
   // Crea un enlace de texto individual para el menu
-  Widget _navItem(String title) {
+  Widget _navItem(String title, VoidCallback onTap) {
     return Padding(
       padding: const EdgeInsets.only(left: 30),
-      child: Text(
-        title,
-        style: const TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w500,
-          color: kDarkGray,
+      child: TextButton(
+        onPressed: onTap,
+        child: Text(
+          title,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+            color: kDarkGray,
+          ),
         ),
       ),
     );
@@ -204,7 +217,7 @@ class HomeView extends StatelessWidget {
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(backgroundColor: kOrange),
                   onPressed: () {
-                    Navigator.pop(context); 
+                    Navigator.pop(context);
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -404,5 +417,34 @@ class HomeView extends StatelessWidget {
         children: [formContent, const SizedBox(height: 40), imageContent],
       );
     }
+  }
+
+  Widget _dialogoCerrarSesion(BuildContext context) {
+    return AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      title: const Row(
+        children: [
+          Icon(Icons.warning_amber_outlined, color: kOrange),
+          SizedBox(width: 10),
+          Text('Cerrar Sesión'),
+        ],
+      ),
+      content: const Text('¿Estás seguro de que deseas cerrar sesión?'),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancelar', style: TextStyle(color: Colors.black)),
+        ),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(backgroundColor: kOrange),
+          onPressed: () async {
+            Navigator.pop(context);
+            final vm = AuthViewModel();
+            await vm.cerrarSesion(context);
+          },
+          child: const Text('Cerrar Sesión', style: TextStyle(color: Colors.black),),
+        ),
+      ],
+    );
   }
 }
