@@ -28,22 +28,49 @@ class _LoginScreenState extends State<LoginScreen> {
     _mostrarCargando();
 
     try {
-      final usuario = await _logica.iniciarSesion(email, password);
+      
+      final datosUsuario = await _logica.iniciarSesion(email, password);
 
-      if (mounted) Navigator.pop(context);
+      if (mounted) Navigator.pop(context); 
 
-      if (usuario != null) {
-        _notificar("¡Éxito! Bienvenido", Colors.green);
+      if (datosUsuario != null) {
+        
+        String rol = datosUsuario['rol'] ?? 'estudiante';
+        
+        
+        String nombre = datosUsuario['nombre'] ?? 'Usuario';
+
+        _notificar("¡Bienvenido, $nombre!", Colors.green);
+
         if (mounted) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const HomeView()),
-          );
+          //Envia segun rol a su respectiva vista
+          if (rol == 'administrador') {
+            /* descomentar para probar admin
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const AdminHomeView()), 
+            ); */
+            
+          } else if (rol == 'bibliotecario') {
+            /* descomentar para probar bibliotecario
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const BibliotecarioHomeView()),
+            );
+            */
+          } else {
+            
+                        Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const HomeView()),
+            );
+            
+          }
         }
       }
     } catch (e) {
       if (mounted) Navigator.pop(context);
-      _notificar("Error: Datos incorrectos", Colors.red);
+      _notificar("Error: Correo o contraseña incorrectos", Colors.red);
     }
   }
 
