@@ -73,4 +73,21 @@ class UsuarioGeneral {
       return null;
     }
   }
+
+  Future<String> obtenerRolUsuario(String uid) async {
+    try {
+      DocumentSnapshot doc = await FirebaseFirestore.instance
+          .collection('usuarios')
+          .doc(uid)
+          .get();
+      if (doc.exists) {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+        return data['rol'] ?? 'estudiante';
+      }
+      return 'estudiante';
+    } catch (e) {
+      print("Error obteniendo rol: $e");
+      return 'estudiante';
+    }
+  }
 }

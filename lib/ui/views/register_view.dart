@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import '../models/UsuarioGeneral.dart';
+import '../../models/UsuarioGeneral.dart';
 
-class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({super.key});
+class RegisterView extends StatefulWidget {
+  const RegisterView({super.key});
 
   @override
-  State<RegisterScreen> createState() => _RegisterScreenState();
+  State<RegisterView> createState() => _RegisterViewState();
 }
 
-class _RegisterScreenState extends State<RegisterScreen> {
+class _RegisterViewState extends State<RegisterView> {
   final TextEditingController _correoController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _nombreController = TextEditingController();
@@ -26,8 +26,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
       return;
     }
 
+    if (!email.endsWith('@correo.unimet.edu.ve')) {
+      _mostrarMensaje(
+        "Solo se permiten correos @correo.unimet.edu.ve",
+        Colors.red,
+      );
+      return;
+    }
+
     if (password != confirm) {
       _mostrarMensaje("Las contraseñas no coinciden", Colors.red);
+      return;
+    }
+
+    if (password.length < 6) {
+      _mostrarMensaje(
+        "La contraseña debe tener al menos 6 caracteres",
+        Colors.red,
+      );
       return;
     }
 
@@ -114,7 +130,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
               const SizedBox(height: 20),
 
-              // Campo Contraseña
+              // Campo Contrasena
               _crearTextField(
                 _passwordController,
                 "Contraseña",
@@ -123,7 +139,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
               const SizedBox(height: 20),
 
-              // Campo Confirmar Contraseña
+              // Campo Confirmar Contrasena
               _crearTextField(
                 _confirmarController,
                 "Confirmar Contraseña",
@@ -132,7 +148,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
               const SizedBox(height: 40),
 
-              // Botón Registrarse
+              // Boton Registrarse
               ElevatedButton(
                 onPressed: _registrar,
                 style:
