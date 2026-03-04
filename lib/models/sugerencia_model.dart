@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class SugerenciaModel {
   final String id; // El ID único de ESTE mensaje de sugerencia
   final String nombre;
@@ -19,7 +21,7 @@ class SugerenciaModel {
       "nombre": nombre,
       "rol": rol,
       "texto": texto,
-      "fecha": fecha.toIso8601String(), 
+      "fecha": Timestamp.fromDate(fecha), 
     };
   }
 

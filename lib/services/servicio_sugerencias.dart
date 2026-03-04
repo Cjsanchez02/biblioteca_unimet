@@ -21,4 +21,11 @@ class ServicioSugerencias {
     // Se va directo a Firebase, sin try-catch (el ViewModel atrapará el error si se cae el internet)
     await _db.collection('sugerencias').add(nuevaSugerencia.toMap());
   }
+
+  Stream<QuerySnapshot> obtenerSugerencias() {
+    return _db
+        .collection('sugerencias')
+        .orderBy('fecha', descending: true) // Las sugerencias más recientes primero
+        .snapshots();
+  }
 }
