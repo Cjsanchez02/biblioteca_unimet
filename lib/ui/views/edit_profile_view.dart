@@ -1,9 +1,7 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:flutter/services.dart';
 
 class EditProfileView extends StatefulWidget {
   const EditProfileView({super.key});
@@ -26,6 +24,7 @@ class _EditProfileViewState extends State<EditProfileView> {
   bool _isSaving = false;
   bool _isUploadingImage = false;
   String? _profileImageUrl;
+  String _rol = 'estudiante'; // Por defecto
 
   @override
   void initState() {
@@ -70,6 +69,7 @@ class _EditProfileViewState extends State<EditProfileView> {
               _phoneController.text = data['telefono'] ?? '';
               _carreraController.text = data['carrera'] ?? '';
               _profileImageUrl = data['fotoUrl'];
+              _rol = data['rol'] ?? 'estudiante';
             }
 
             _isLoading = false;
@@ -90,6 +90,7 @@ class _EditProfileViewState extends State<EditProfileView> {
   /// y actualizar el enlace de la foto en su documento de Firestore.
   /// NO FUNCIONA TODAVIA
   /// TODO: IMPLEMENTAR
+  /* 
   Future<void> _changeProfilePicture() async {
     final ImagePicker picker = ImagePicker();
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
@@ -137,6 +138,7 @@ class _EditProfileViewState extends State<EditProfileView> {
       }
     }
   }
+  */
 
   /// Recopila los datos de los campos de texto y los guarda en Firestore.
   /// Tambien actualiza el 'displayName' en Firebase Auth y la contrasena si se
@@ -162,13 +164,13 @@ class _EditProfileViewState extends State<EditProfileView> {
           await currentUser.updateDisplayName(_nameController.text.trim());
         }
 
-        // NUEVA LOGICA: CAMBIAR CONTRASEÑA
+        // NUEVA LOGICA: CAMBIAR CONTRASENA
         if (_passwordController.text.trim().isNotEmpty) {
           if (_passwordController.text.trim().length < 6) {
             throw Exception('La contraseña debe tener al menos 6 caracteres');
           }
           await currentUser.updatePassword(_passwordController.text.trim());
-          _passwordController.clear(); // Limpiamos el campo tras el éxito
+          _passwordController.clear();
         }
 
         if (mounted) {
@@ -240,9 +242,7 @@ class _EditProfileViewState extends State<EditProfileView> {
                           bottom: 0,
                           right: 0,
                           child: GestureDetector(
-                            onTap: _isUploadingImage
-                                ? null
-                                : _changeProfilePicture,
+                            onTap: null, // Desactivado por ahora
                             child: CircleAvatar(
                               radius: 18,
                               backgroundColor: kOrange,
@@ -275,10 +275,17 @@ class _EditProfileViewState extends State<EditProfileView> {
                     enabled: false, // Bloqueado para que no lo puedan editar
                   ),
                   const SizedBox(height: 20),
-                  _buildTextField("Telefono", _phoneController),
+                  _buildTextField(
+                    "Telefono",
+                    _phoneController,
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  ),
                   const SizedBox(height: 20),
-                  _buildTextField("Carrera", _carreraController),
-                  const SizedBox(height: 20),
+                  if (_rol == 'estudiante') ...[
+                    _buildTextField("Carrera", _carreraController),
+                    const SizedBox(height: 20),
+                  ],
                   _buildTextField(
                     "Nueva Contraseña",
                     _passwordController,
@@ -322,6 +329,8 @@ class _EditProfileViewState extends State<EditProfileView> {
     bool enabled = true,
     bool isPassword = false,
     String? hint,
+    TextInputType? keyboardType,
+    List<TextInputFormatter>? inputFormatters,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -339,6 +348,8 @@ class _EditProfileViewState extends State<EditProfileView> {
           controller: controller,
           enabled: enabled,
           obscureText: isPassword,
+          keyboardType: keyboardType,
+          inputFormatters: inputFormatters,
           decoration: InputDecoration(
             hintText: hint,
             filled: true,

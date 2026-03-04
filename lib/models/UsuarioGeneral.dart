@@ -2,42 +2,18 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-enum RolUsuario { 
-  estudiante,  
-  administrador, 
-  bibliotecario
-
 class UsuarioGeneral {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  Future<Map<String, dynamic>?> iniciarSesion(String email, String password) async {
+  Future<User?> iniciarSesion(String email, String password) async {
     try {
-    
       UserCredential userCredential = await _auth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
 
-      if (userCredential.user != null) {
-        
-        var docUsuario = await FirebaseFirestore.instance
-            .collection('usuarios')
-            .doc(userCredential.user!.uid)
-            .get();
-
-       
-        if (docUsuario.exists) {
-          
-          return docUsuario.data(); 
-        } else {
-         
-          throw Exception("Este usuario no tiene datos en el sistema");
-        }
-      }
-      return null;
-      
+      return userCredential.user;
     } on FirebaseAuthException catch (e) {
-      
       if (e.code == 'user-not-found') {
         print('No existe un usuario con ese correo.');
       } else if (e.code == 'wrong-password') {
@@ -45,13 +21,13 @@ class UsuarioGeneral {
       } else if (e.code == 'invalid-email') {
         print('El formato del correo no es válido.');
       }
-      rethrow; 
-      
+
+      rethrow;
     } catch (e) {
       print('Error inesperado: $e');
-      rethrow;
+      return null;
     }
-}
+  }
 
   Future<void> cerrarSesion() async {
     try {
@@ -71,22 +47,6 @@ class UsuarioGeneral {
     String nombre,
   ) async {
     try {
-      final consultaDb = await FirebaseFirestore.instance
-          .collection('usuarios')
-          .where('email', isEqualTo: email)
-          .get();
-
-      if (consultaDb.docs.isNotEmpty) {
-        
-        final datosUsuario = consultaDb.docs.first.data();
-        final String rolGuardado = datosUsuario['rol'] ?? 'estudiante';
-
-        if (rolGuardado == 'administrador' || rolGuardado == 'bibliotecario') {
-          throw Exception('El correo ya está registrado con un rol no permitido para el registro'); 
-        } else {
-          throw Exception('El correo ya está registrado');
-        }
-      }
       UserCredential userCredential = await _auth
           .createUserWithEmailAndPassword(email: email, password: password);
 
@@ -111,6 +71,23 @@ class UsuarioGeneral {
       rethrow;
     } catch (e) {
       return null;
+    }
+  }
+
+  Future<String> obtenerRolUsuario(String uid) async {
+    try {
+      DocumentSnapshot doc = await FirebaseFirestore.instance
+          .collection('usuarios')
+          .doc(uid)
+          .get();
+      if (doc.exists) {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+        return data['rol'] ?? 'estudiante';
+      }
+      return 'estudiante';
+    } catch (e) {
+      print("Error obteniendo rol: $e");
+      return 'estudiante';
     }
   }
 }
