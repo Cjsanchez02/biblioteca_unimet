@@ -2,15 +2,30 @@ import 'package:biblioteca_unimet/ui/views/donation_view.dart';
 import 'package:flutter/material.dart';
 import 'package:biblioteca_unimet/viewmodels/auth_viewmodel.dart';
 import 'package:biblioteca_unimet/ui/views/edit_profile_view.dart';
+import 'package:biblioteca_unimet/viewmodels/sugerencia_viewmodel.dart';
 
-class HomeView extends StatelessWidget {
+class HomeView extends StatefulWidget {
   const HomeView({super.key});
 
   static const Color kOrange = Color(0xFFF7941D);
   static const Color kDarkGray = Color(0xFF333333);
   static const Color kLightGray = Color(0xFFF4F4F4);
 
+  @override
+  State<HomeView> createState() => _HomeViewState();
+}
+
+class _HomeViewState extends State<HomeView> {
   // Construye la estructura principal
+  final TextEditingController _sugerenciaController = TextEditingController();
+  final HomeViewModel _viewModel = HomeViewModel();
+
+  @override
+  void dispose() {
+    _sugerenciaController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -65,7 +80,7 @@ class HomeView extends StatelessWidget {
             style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.bold,
-              color: kDarkGray,
+              color: HomeView.kDarkGray,
             ),
           ),
           if (isDesktop)
@@ -94,7 +109,7 @@ class HomeView extends StatelessWidget {
               ],
             )
           else
-            const Icon(Icons.menu, color: kDarkGray),
+            const Icon(Icons.menu, color: HomeView.kDarkGray),
         ],
       ),
     );
@@ -111,7 +126,7 @@ class HomeView extends StatelessWidget {
           style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w500,
-            color: kDarkGray,
+            color: HomeView.kDarkGray,
           ),
         ),
       ),
@@ -128,14 +143,14 @@ class HomeView extends StatelessWidget {
             style: TextStyle(
               fontSize: 48,
               fontWeight: FontWeight.bold,
-              color: kDarkGray,
+              color: HomeView.kDarkGray,
               height: 1.1,
             ),
             children: [
               TextSpan(text: 'Un Puente entre\nsiglos de '),
               TextSpan(
                 text: 'saber',
-                style: TextStyle(color: kOrange),
+                style: TextStyle(color: HomeView.kOrange),
               ),
             ],
           ),
@@ -148,7 +163,7 @@ class HomeView extends StatelessWidget {
         const SizedBox(height: 40),
         ElevatedButton(
           style: ElevatedButton.styleFrom(
-            backgroundColor: kOrange,
+            backgroundColor: HomeView.kOrange,
             padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
@@ -167,7 +182,7 @@ class HomeView extends StatelessWidget {
       height: 400,
       width: double.infinity,
       decoration: BoxDecoration(
-        color: kLightGray,
+        color: HomeView.kLightGray,
         borderRadius: BorderRadius.circular(20),
       ),
       child: ClipRRect(
@@ -223,7 +238,7 @@ class HomeView extends StatelessWidget {
                   ),
                 ),
                 ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: kOrange),
+                  style: ElevatedButton.styleFrom(backgroundColor: HomeView.kOrange),
                   onPressed: () {
                     Navigator.pop(context);
                     Navigator.push(
@@ -278,7 +293,7 @@ class HomeView extends StatelessWidget {
           width: double.infinity,
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: kOrange,
+              backgroundColor: HomeView.kOrange,
               padding: const EdgeInsets.symmetric(vertical: 20),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
@@ -300,14 +315,12 @@ class HomeView extends StatelessWidget {
   }
 
   // Construye la seccion inferior que contiene la segunda imagen
-  // y el formulario de contacto
-
   Widget _buildFooterSection(bool isDesktop) {
     Widget imageContent = Container(
       height: 350,
       width: double.infinity,
       decoration: BoxDecoration(
-        color: kLightGray,
+        color: HomeView.kLightGray,
         borderRadius: BorderRadius.circular(20),
       ),
       child: ClipRRect(
@@ -345,7 +358,7 @@ class HomeView extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
-                  color: kDarkGray,
+                  color: HomeView.kDarkGray,
                 ),
               ),
               const SizedBox(height: 10),
@@ -354,13 +367,16 @@ class HomeView extends StatelessWidget {
                 style: TextStyle(fontSize: 16, color: Colors.black54),
               ),
               const SizedBox(height: 30),
+              // 1. La caja de texto conectada al controlador y con límite de 500
               TextField(
+                controller: _sugerenciaController, // Conectamos el controlador
                 maxLines: 4,
+                maxLength: 500, // ¡Flutter pone el contador 0/500 automáticamente!
                 decoration: InputDecoration(
                   hintText: 'Escribe tu mensaje aqui...',
                   hintStyle: const TextStyle(color: Colors.black38),
                   filled: true,
-                  fillColor: kLightGray,
+                  fillColor: HomeView.kLightGray, // Ajusté la constante por si marca error
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                     borderSide: BorderSide.none,
@@ -368,17 +384,38 @@ class HomeView extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 20),
+
+              // 2. El botón conectado a tu ViewModel
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: kOrange,
+                    backgroundColor: HomeView.kOrange, // Ajusté la constante
                     padding: const EdgeInsets.symmetric(vertical: 20),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                  onPressed: () {},
+                  onPressed: () async {
+                    // Llamamos a tu lógica limpia
+                    bool exito = await _viewModel.enviarSugerencia(
+                      _sugerenciaController.text, 
+                      context
+                    );
+                    
+                    // Si Firebase lo guardó bien, vaciamos la caja y avisamos
+                    if (exito) {
+                      _sugerenciaController.clear();
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('¡Sugerencia enviada con éxito!'),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
+                      }
+                    }
+                  },
                   child: const Text(
                     'Enviar mensaje',
                     style: TextStyle(
@@ -397,7 +434,7 @@ class HomeView extends StatelessWidget {
           right: -20,
           child: CircleAvatar(
             radius: 30,
-            backgroundColor: kDarkGray,
+            backgroundColor: HomeView.kDarkGray,
             child: const Text(
               '?',
               style: TextStyle(
@@ -432,7 +469,7 @@ class HomeView extends StatelessWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       title: const Row(
         children: [
-          Icon(Icons.warning_amber_outlined, color: kOrange),
+          Icon(Icons.warning_amber_outlined, color: HomeView.kOrange),
           SizedBox(width: 10),
           Text('Cerrar Sesión'),
         ],
@@ -444,7 +481,7 @@ class HomeView extends StatelessWidget {
           child: const Text('Cancelar', style: TextStyle(color: Colors.black)),
         ),
         ElevatedButton(
-          style: ElevatedButton.styleFrom(backgroundColor: kOrange),
+          style: ElevatedButton.styleFrom(backgroundColor: HomeView.kOrange),
           onPressed: () async {
             Navigator.pop(context);
             final vm = AuthViewModel();
@@ -459,3 +496,4 @@ class HomeView extends StatelessWidget {
     );
   }
 }
+
