@@ -1,7 +1,9 @@
 import 'package:biblioteca_unimet/ui/views/donation_view.dart';
+import 'package:biblioteca_unimet/ui/views/mymaterial_view.dart';
 import 'package:flutter/material.dart';
 import 'package:biblioteca_unimet/viewmodels/auth_viewmodel.dart';
 import 'package:biblioteca_unimet/ui/views/edit_profile_view.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
@@ -200,8 +202,38 @@ class HomeView extends StatelessWidget {
   // Renderiza los bloques de accion rapida (Catalogo, Prestamos, Donaciones)
   Widget _buildActionSection(BuildContext context, bool isDesktop) {
     List<Widget> actions = [
-      _actionBlock(Icons.menu_book, 'Catalogo', () {}),
-      _actionBlock(Icons.bookmark_added, 'Gestion y Prestamos', () {}),
+      _actionBlock(Icons.menu_book, 'Catalogo', () {
+        // De aquí se va al catálogo
+        print("Yendo al Catálogo...");
+        /*
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const CatalogoView()),
+        );
+        */}),
+      _actionBlock(Icons.bookmark_added, 'Gestion y Prestamos', () {
+        
+        final usuarioActual = FirebaseAuth.instance.currentUser;
+
+        //Verificacion
+        if (usuarioActual != null && usuarioActual.email != null) {
+          
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => MisPrestamosView(
+                correoUsuario: usuarioActual.email!, 
+              ),
+            ),
+          );
+          
+        } else {
+          
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Error: No se encontró la sesión del usuario.')),
+          );
+        }
+      }),
       _actionBlock(Icons.volunteer_activism, 'Donaciones', () {
         showDialog(
           context: context,
