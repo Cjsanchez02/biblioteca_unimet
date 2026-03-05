@@ -1,3 +1,4 @@
+import 'package:biblioteca_unimet/ui/views/admin_catalog_view.dart';
 import 'package:biblioteca_unimet/ui/views/donation_view.dart';
 import 'package:flutter/material.dart';
 import 'package:biblioteca_unimet/viewmodels/auth_viewmodel.dart';
@@ -183,7 +184,56 @@ class AdminView extends StatelessWidget {
   // Renderiza los bloques de accion rapida (Gestion Usuarios, Prestamos, Donaciones, Estadisticas)
   Widget _buildActionSection(BuildContext context, bool isDesktop) {
     List<Widget> actions = [
-      _actionBlock(Icons.menu_book, 'Catálogo', () {}),
+      _actionBlock(Icons.menu_book, 'Catálogo', () {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15),
+              ),
+              title: const Text('¿Qué acción desea realizar?'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text(
+                    'Cancelar',
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(backgroundColor: kOrange),
+                  onPressed: () {
+                    Navigator.pop(context);
+                    // Aquí iría el formulario de agregar nuevo material
+                  },
+                  child: const Text('Agregar'),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(backgroundColor: kOrange),
+                  onPressed: () {
+                    Navigator.pop(context);
+                    // Aquí iría el formulario de editar material
+                  },
+                  child: const Text('Editar'),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(backgroundColor: kOrange),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const AdminCatalogView(),
+                      ),
+                    );
+                  },
+                  child: const Text('Eliminar'),
+                ),
+              ],
+            );
+          },
+        );
+      }),
       _actionBlock(Icons.bookmark_added, 'Gestión y Préstamos', () {}),
       _actionBlock(Icons.volunteer_activism, 'Donaciones', () {
         showDialog(
@@ -193,7 +243,7 @@ class AdminView extends StatelessWidget {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(15),
               ),
-              title: const Text('Redirección a página de pagos'),
+              title: const Text('Qué acción desea realizar?'),
               content: const Text(
                 'Está a punto de ser redirigido a la plataforma de PayPal para continuar con su donación.',
               ),
