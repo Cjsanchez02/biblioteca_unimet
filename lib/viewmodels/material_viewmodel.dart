@@ -4,36 +4,42 @@ import 'package:flutter/material.dart';
 class MaterialViewModel extends ChangeNotifier {
   final servicioMaterial _service = servicioMaterial();
 
-  String _query = "";
-  String _criterio = "Título"; // Criterio por defecto
+  String _textoBusquedaTemp = ""; // Lo que el usuario escribe
+  String _queryConfirmada = "";   // Lo que realmente se filtra
+  String _criterio = "Título";
 
-  void actualizarFiltro(String text) {
-    _query = text.toLowerCase();
-    notifyListeners();
+  String get criterio => _criterio;
+
+  // Actualiza lo que el usuario escribe sin disparar el filtro todavía
+  void setTextoTemporal(String text) {
+    _textoBusquedaTemp = text.toLowerCase();
   }
 
   void actualizarCriterio(String? nuevoCriterio) {
     if (nuevoCriterio != null) {
       _criterio = nuevoCriterio;
-      notifyListeners();
     }
   }
 
-  String get criterio => _criterio;
+  // ESTE MÉTODO SE LLAMA AL DARLE AL BOTÓN
+  void aplicarFiltro() {
+    _queryConfirmada = _textoBusquedaTemp;
+    notifyListeners(); // la vista se actualiza
+  }
 
   List<Map<String, dynamic>> filtrarMateriales(List<Map<String, dynamic>> listaCompleta) {
-    if (_query.isEmpty) return listaCompleta;
+    if (_queryConfirmada.isEmpty) return listaCompleta;
 
     return listaCompleta.where((m) {
       String campoABuscar = "";
-      
       if (_criterio == "Título") campoABuscar = (m['titulo'] ?? '').toString().toLowerCase();
       if (_criterio == "Autor") campoABuscar = (m['autor'] ?? '').toString().toLowerCase();
       if (_criterio == "Materia") campoABuscar = (m['materia'] ?? '').toString().toLowerCase();
 
-      return campoABuscar.contains(_query);
+      return campoABuscar.contains(_queryConfirmada);
     }).toList();
   }
+
 
 
   Future<bool> guardarMaterial({

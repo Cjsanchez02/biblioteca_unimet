@@ -185,53 +185,9 @@ class AdminView extends StatelessWidget {
   Widget _buildActionSection(BuildContext context, bool isDesktop) {
     List<Widget> actions = [
       _actionBlock(Icons.menu_book, 'Catálogo', () {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15),
-              ),
-              title: const Text('¿Qué acción desea realizar?'),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text(
-                    'Cancelar',
-                    style: TextStyle(color: Colors.grey),
-                  ),
-                ),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: kOrange),
-                  onPressed: () {
-                    Navigator.pop(context);
-                    // Aquí iría el formulario de agregar nuevo material
-                  },
-                  child: const Text('Agregar'),
-                ),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: kOrange),
-                  onPressed: () {
-                    Navigator.pop(context);
-                    // Aquí iría el formulario de editar material
-                  },
-                  child: const Text('Editar'),
-                ),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: kOrange),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const AdminCatalogView(),
-                      ),
-                    );
-                  },
-                  child: const Text('Eliminar'),
-                ),
-              ],
-            );
-          },
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const AdminCatalogView()),
         );
       }),
       _actionBlock(Icons.bookmark_added, 'Gestión y Préstamos', () {}),

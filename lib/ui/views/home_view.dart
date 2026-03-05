@@ -1,5 +1,6 @@
 import 'package:biblioteca_unimet/ui/views/donation_view.dart';
 import 'package:biblioteca_unimet/ui/views/mymaterial_view.dart';
+import 'package:biblioteca_unimet/ui/views/user_catalog_view.dart';
 import 'package:flutter/material.dart';
 import 'package:biblioteca_unimet/viewmodels/auth_viewmodel.dart';
 import 'package:biblioteca_unimet/ui/views/edit_profile_view.dart';
@@ -32,7 +33,7 @@ class HomeView extends StatelessWidget {
                   ),
                   child: Column(
                     children: [
-                      _buildHeroSection(isDesktop),
+                      _buildHeroSection(context, isDesktop),
                       const SizedBox(height: 80),
                       _buildActionSection(context, isDesktop),
                       const SizedBox(height: 60),
@@ -121,7 +122,7 @@ class HomeView extends StatelessWidget {
   }
 
   // Construye la seccion principal con el mensaje de bienvenida y la primera imagen
-  Widget _buildHeroSection(bool isDesktop) {
+  Widget _buildHeroSection(BuildContext context, bool isDesktop) {
     Widget textContent = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -156,7 +157,12 @@ class HomeView extends StatelessWidget {
               borderRadius: BorderRadius.circular(8),
             ),
           ),
-          onPressed: () {},
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const UserCatalogView()),
+            );
+          },
           child: const Text(
             'Explorar Biblioteca',
             style: TextStyle(fontSize: 18, color: Colors.white),
@@ -203,34 +209,28 @@ class HomeView extends StatelessWidget {
   Widget _buildActionSection(BuildContext context, bool isDesktop) {
     List<Widget> actions = [
       _actionBlock(Icons.menu_book, 'Catalogo', () {
-        // De aquí se va al catálogo
-        print("Yendo al Catálogo...");
-        /*
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const CatalogoView()),
+          MaterialPageRoute(builder: (context) => const UserCatalogView()),
         );
-        */}),
+      }),
       _actionBlock(Icons.bookmark_added, 'Gestion y Prestamos', () {
-        
         final usuarioActual = FirebaseAuth.instance.currentUser;
 
         //Verificacion
         if (usuarioActual != null && usuarioActual.email != null) {
-          
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => MisPrestamosView(
-                correoUsuario: usuarioActual.email!, 
-              ),
+              builder: (context) =>
+                  MisPrestamosView(correoUsuario: usuarioActual.email!),
             ),
           );
-          
         } else {
-          
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Error: No se encontró la sesión del usuario.')),
+            const SnackBar(
+              content: Text('Error: No se encontró la sesión del usuario.'),
+            ),
           );
         }
       }),

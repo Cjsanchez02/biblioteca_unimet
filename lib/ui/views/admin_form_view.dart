@@ -30,7 +30,7 @@ class _AdminMaterialFormState extends State<AdminMaterialForm> {
   @override
   void initState() {
     super.initState();
-    // Si es editar o eliminar, precargamos los datos
+    // Si se está eliminando o editando, se obtienen los datos
     if (widget.materialExistente != null) {
       _tituloCtrl.text = widget.materialExistente!['titulo'] ?? '';
       _autorCtrl.text = widget.materialExistente!['autor'] ?? '';
@@ -40,7 +40,7 @@ class _AdminMaterialFormState extends State<AdminMaterialForm> {
     }
   }
 
-  // VALIDACIONES SOLICITADAS
+  // VALIDACIONES
   String? _validarTexto(String? value) {
     if (value == null || value.isEmpty) return 'Campo obligatorio';
     if (RegExp(r'^[0-9]+$').hasMatch(value)) return 'No puede contener solo números';
@@ -83,13 +83,13 @@ class _AdminMaterialFormState extends State<AdminMaterialForm> {
         ),
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar')),
+        TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar', style: TextStyle(color: Colors.black))),
         ElevatedButton(
           style: ElevatedButton.styleFrom(
             backgroundColor: esEliminar ? Colors.red : const Color(0xFFF7941D)
           ),
           onPressed: _procesarAccion,
-          child: Text(widget.modo == ModoFormulario.eliminar ? 'Confirmar Eliminar' : 'Guardar'),
+          child: Text(widget.modo == ModoFormulario.eliminar ? 'Confirmar Eliminar' : 'Guardar', style: const TextStyle(color: Colors.black)),
         ),
       ],
     );
