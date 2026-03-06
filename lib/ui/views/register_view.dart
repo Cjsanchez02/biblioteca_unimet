@@ -163,8 +163,9 @@ class _RegisterViewState extends State<RegisterView> {
                       backgroundColor: WidgetStateProperty.resolveWith<Color?>((
                         states,
                       ) {
-                        if (states.contains(WidgetState.hovered))
+                        if (states.contains(WidgetState.hovered)) {
                           return Colors.grey[300];
+                        }
                         return const Color(0xFFFF9500);
                       }),
                     ),
