@@ -5,6 +5,8 @@ class MaterialBibliografico {
   String materia;
   int stock;
   double calificacionPromedio;
+  int totalVotos;
+  int vecesSolicitado;
 
   MaterialBibliografico({
     required this.id,
@@ -13,6 +15,8 @@ class MaterialBibliografico {
     required this.materia,
     required this.stock,
     this.calificacionPromedio = 0.0,
+    this.totalVotos = 0,
+    this.vecesSolicitado = 0,
   });
 
   // Revisa si hay stock disponible
@@ -33,6 +37,8 @@ class MaterialBibliografico {
       materia: map['categoria'] ?? 'OTRO',
       stock: map['stock'] ?? 0,
       calificacionPromedio: (map['calificacionPromedio'] ?? 0.0).toDouble(),
+      totalVotos: map['totalVotos'] ?? 0,
+      vecesSolicitado: map['vecesSolicitado'] ?? 0,
     );
   }
 
@@ -44,6 +50,8 @@ class MaterialBibliografico {
       'materia': materia,
       'stock': stock,
       'calificacionPromedio': calificacionPromedio,
+      'totalVotos': totalVotos,
+      'vecesSolicitado': vecesSolicitado,
     };
   }
 }
