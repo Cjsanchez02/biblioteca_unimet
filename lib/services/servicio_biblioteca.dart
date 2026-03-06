@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/Prestamo.dart';
-import '../models/materialbibliografico.dart';
+import '../models/MaterialBibliografico.dart';
 
 class BibliotecaService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -12,6 +12,7 @@ class BibliotecaService {
       final prestamosActivos = await _db.collection('prestamos')
           .where('correoSolicitante', isEqualTo: correoUsuario) // Filtramos por su correo
           .where('materialId', isEqualTo: libro.id)             // Filtramos por el ID del libro
+          .where('estado', isEqualTo: 'prestado')
           .get(); 
 
       // Verificacion
@@ -33,7 +34,7 @@ class BibliotecaService {
         fechaDevolucion: DateTime.now().add(const Duration(days: 7)),
         materialId: libro.id,
         tituloMaterial: libro.titulo,
-        estado: 'prestado',
+        estado: 'solicitado',
       );
 
       
@@ -44,7 +45,7 @@ class BibliotecaService {
       batch.set(prestamoRef, nuevoPrestamo.toMap());
 
       // Restamos 1 al stock del libro
-      DocumentReference libroRef = _db.collection('materiales').doc(libro.id);
+      DocumentReference libroRef = _db.collection('material_academico').doc(libro.id);
       batch.update(libroRef, {'stock': FieldValue.increment(-1)});
 
       // Ejecucion en paralelo
@@ -60,33 +61,83 @@ class BibliotecaService {
   }
   
   Future<bool> extenderPrestamo(String prestamoId) async {
+  try {
+    DocumentReference prestamoRef = _db.collection('prestamos').doc(prestamoId);
+    DocumentSnapshot doc = await prestamoRef.get();
+
+    if (doc.exists) {
+      // Obtenemos la fecha actual
+      Timestamp currentDevolucion = doc['fechaDevolucion']; 
+      DateTime nuevaFecha = currentDevolucion.toDate().add(const Duration(days: 7));
+
+      await prestamoRef.update({
+        'fechaDevolucion': nuevaFecha, 
+        'estado': 'aprobado' 
+      });
+
+      return true;
+    }
+    return false;
+  } catch (e) {
+    print("Error al extender: $e");
+    return false;
+  }
+}
+  
+  Future<bool> aprobarPrestamo(String prestamoId) async {
     try {
-      // Buscar libro
-      DocumentReference prestamoRef = _db.collection('prestamos').doc(prestamoId);
-      DocumentSnapshot doc = await prestamoRef.get();
-
-      if (doc.exists) {
-        Timestamp timestampFirebase = doc['fechaSolicitud']; 
-        DateTime fechaActual = timestampFirebase.toDate();
+     
+      await _db.collection('prestamos').doc(prestamoId).update({
+        'estado': 'aprobado',
         
-        // +7
-        DateTime nuevaFecha = fechaActual.add(const Duration(days: 7));
-
-        // a Firebase
-        await prestamoRef.update({
-          'fechaDevolucion': nuevaFecha, 
-          'estado': 'prestado' 
-        });
-
-        print("Préstamo extendido con éxito.");
-        return true;
-      }
-      return false;
+      });
+      print("¡Préstamo aprobado!");
+      return true;
     } catch (e) {
-      print("Error al extender el préstamo: $e");
+      print("Error al aprobar préstamo: $e");
       return false;
     }
   }
-  // Future<void> devolverLibro(...)
+
+
+  Future<bool> devolverPrestamo(String prestamoId, String materialId) async {
+    try {
+      WriteBatch batch = _db.batch();
+
+      
+      DocumentReference prestamoRef = _db.collection('prestamos').doc(prestamoId);
+      batch.update(prestamoRef, {'estado': 'devuelto'});
+
+      
+      DocumentReference libroRef = _db.collection('material_academico').doc(materialId);
+      batch.update(libroRef, {'stock': FieldValue.increment(1)});
+
+      
+      await batch.commit();
+      
+      print("¡Libro devuelto con éxito y stock actualizado!");
+      return true;
+    } catch (e) {
+      print("Error al devolver el libro: $e");
+      return false;
+    }
+  }
+  Future<bool> rechazarPrestamo(String prestamoId, String materialId) async {
+    try {
+      WriteBatch batch = _db.batch();
+
+      DocumentReference prestamoRef = _db.collection('prestamos').doc(prestamoId);
+      batch.update(prestamoRef, {'estado': 'rechazado'});
+
+      DocumentReference libroRef = _db.collection('material_academico').doc(materialId);
+      batch.update(libroRef, {'stock': FieldValue.increment(1)});
+
+      await batch.commit();
+      
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
   
 }

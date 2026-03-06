@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:biblioteca_unimet/services/servicio_material.dart';
 import 'package:biblioteca_unimet/viewmodels/material_viewmodel.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:biblioteca_unimet/services/servicio_biblioteca.dart';
+import 'package:biblioteca_unimet/models/MaterialBibliografico.dart';
 
 class UserCatalogView extends StatefulWidget {
   const UserCatalogView({super.key});
@@ -175,14 +178,55 @@ class _UserCatalogViewState extends State<UserCatalogView> {
               const SizedBox(height: 10),
               // BOTÓN DE SOLICITAR (Solo habilitado si hay stock)
               ElevatedButton(
-                onPressed: disponible ? () { /* Por ahora no hace nada */ } : null,
+                onPressed: disponible ? () async {
+                  final usuarioActual = FirebaseAuth.instance.currentUser;
+                  
+                  if (usuarioActual != null && usuarioActual.email != null) {
+                    String correo = usuarioActual.email!;
+
+                   
+                    MaterialBibliografico libroSolicitado = MaterialBibliografico.fromMap(
+                      material, 
+                      material['id'] ?? '',
+                    );
+
+                    
+                    bool exito = await BibliotecaService().solicitarPrestamo(correo, libroSolicitado);
+
+                    if (context.mounted) {
+                      if (exito) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('¡Libro solicitado con éxito! Revisa "Mis Préstamos"'),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Error: Ocurrió un problema o ya tienes este libro.'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
+                    }
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Inicia sesión para pedir libros.'),
+                        backgroundColor: Colors.orange,
+                      ),
+                    );
+                  }
+                } : null, // Apagado si no hay stock
+                
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: kOrange,
+                  backgroundColor: disponible ? kOrange : Colors.grey,
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(horizontal: 10),
                   textStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold)
                 ),
-                child: const Text("SOLICITAR"),
+                child: Text(disponible ? "SOLICITAR" : "AGOTADO"),
               ),
             ],
           ),

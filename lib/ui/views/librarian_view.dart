@@ -3,6 +3,7 @@ import 'package:biblioteca_unimet/ui/views/librarian_catalog_view.dart';
 import 'package:flutter/material.dart';
 import 'package:biblioteca_unimet/viewmodels/auth_viewmodel.dart';
 import 'package:biblioteca_unimet/ui/views/edit_profile_view.dart';
+import 'package:biblioteca_unimet/ui/views/librarian_prestamos_view.dart';
 
 class LibrarianView extends StatelessWidget {
   const LibrarianView({super.key});
@@ -190,7 +191,10 @@ class LibrarianView extends StatelessWidget {
           MaterialPageRoute(builder: (context) => const LibrarianCatalogView()),
         );
       }),
-      _actionBlock(Icons.bookmark_added, 'Gestión y Préstamos', () {}),
+      _actionBlock(Icons.bookmark_added, 'Gestión y Préstamos', () {Navigator.push(
+    context,
+    MaterialPageRoute(builder: (context) => LibrarianPrestamosView()),
+  );}),
       
       _actionBlock(Icons.inbox, 'Sugerencias', () {
         Navigator.push(

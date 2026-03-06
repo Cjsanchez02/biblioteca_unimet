@@ -11,7 +11,7 @@ class Prestamo {
   double multa;
   String materialId; 
   String tituloMaterial; 
-  String estado; // "solicitado", "devuelto", "atrasado", "prestado"
+  String estado; // "solicitado", "devuelto", "atrasado", "prestado"; "rechazado"
 
   Prestamo({
     required this.id,

@@ -102,7 +102,7 @@ class MisPrestamosView extends StatelessWidget {
         colorEstado = Colors.red;
         iconoEstado = Icons.warning;
         break;
-      case 'prestado':
+      case 'aprobado':
       default:
         colorEstado = Colors.green;
         iconoEstado = Icons.menu_book;
@@ -150,7 +150,7 @@ class MisPrestamosView extends StatelessWidget {
           ),
           
           
-          if (estado.toLowerCase() == 'prestado' || estado.toLowerCase() == 'atrasado')
+          if (estado.toLowerCase() == 'aprobado' || estado.toLowerCase() == 'atrasado')
             Padding(
               padding: const EdgeInsets.only(right: 15, bottom: 10),
               child: Align(
