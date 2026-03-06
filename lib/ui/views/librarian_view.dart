@@ -1,4 +1,5 @@
 import 'package:biblioteca_unimet/ui/views/lista_sugerencias_view.dart';
+import 'package:biblioteca_unimet/ui/views/librarian_catalog_view.dart';
 import 'package:flutter/material.dart';
 import 'package:biblioteca_unimet/viewmodels/auth_viewmodel.dart';
 import 'package:biblioteca_unimet/ui/views/edit_profile_view.dart';
@@ -183,7 +184,12 @@ class LibrarianView extends StatelessWidget {
   // Renderiza los bloques de accion rapida (Catalogo, Prestamos, Sugerencias, Estadisticas)
   Widget _buildActionSection(BuildContext context, bool isDesktop) {
     List<Widget> actions = [
-      _actionBlock(Icons.menu_book, 'Catálogo', () {}),
+      _actionBlock(Icons.menu_book, 'Catálogo', () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const LibrarianCatalogView()),
+        );
+      }),
       _actionBlock(Icons.bookmark_added, 'Gestión y Préstamos', () {}),
       
       _actionBlock(Icons.inbox, 'Sugerencias', () {

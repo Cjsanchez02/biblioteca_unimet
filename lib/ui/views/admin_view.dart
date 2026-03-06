@@ -1,3 +1,4 @@
+import 'package:biblioteca_unimet/ui/views/admin_catalog_view.dart';
 import 'package:biblioteca_unimet/ui/views/donation_view.dart';
 import 'package:flutter/material.dart';
 import 'package:biblioteca_unimet/viewmodels/auth_viewmodel.dart';
@@ -183,7 +184,12 @@ class AdminView extends StatelessWidget {
   // Renderiza los bloques de accion rapida (Gestion Usuarios, Prestamos, Donaciones, Estadisticas)
   Widget _buildActionSection(BuildContext context, bool isDesktop) {
     List<Widget> actions = [
-      _actionBlock(Icons.menu_book, 'Catálogo', () {}),
+      _actionBlock(Icons.menu_book, 'Catálogo', () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const AdminCatalogView()),
+        );
+      }),
       _actionBlock(Icons.bookmark_added, 'Gestión y Préstamos', () {}),
       _actionBlock(Icons.volunteer_activism, 'Donaciones', () {
         showDialog(
@@ -193,7 +199,7 @@ class AdminView extends StatelessWidget {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(15),
               ),
-              title: const Text('Redirección a página de pagos'),
+              title: const Text('Qué acción desea realizar?'),
               content: const Text(
                 'Está a punto de ser redirigido a la plataforma de PayPal para continuar con su donación.',
               ),

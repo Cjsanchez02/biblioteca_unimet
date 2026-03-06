@@ -2,7 +2,7 @@ class MaterialBibliografico {
   String id;
   String titulo;
   String autor;
-  String categoria;
+  String materia;
   int stock;
   double calificacionPromedio;
 
@@ -10,7 +10,7 @@ class MaterialBibliografico {
     required this.id,
     required this.titulo,
     required this.autor,
-    required this.categoria,
+    required this.materia,
     required this.stock,
     this.calificacionPromedio = 0.0,
   });
@@ -30,7 +30,7 @@ class MaterialBibliografico {
       id: documentId,
       titulo: map['titulo'] ?? '',
       autor: map['autor'] ?? '',
-      categoria: map['categoria'] ?? 'OTRO',
+      materia: map['categoria'] ?? 'OTRO',
       stock: map['stock'] ?? 0,
       calificacionPromedio: (map['calificacionPromedio'] ?? 0.0).toDouble(),
     );
@@ -41,7 +41,7 @@ class MaterialBibliografico {
     return {
       'titulo': titulo,
       'autor': autor,
-      'categoria': categoria,
+      'materia': materia,
       'stock': stock,
       'calificacionPromedio': calificacionPromedio,
     };
