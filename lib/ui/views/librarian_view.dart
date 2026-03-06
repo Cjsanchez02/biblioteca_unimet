@@ -1,4 +1,4 @@
-import 'package:biblioteca_unimet/ui/views/donation_view.dart';
+import 'package:biblioteca_unimet/ui/views/lista_sugerencias_view.dart';
 import 'package:biblioteca_unimet/ui/views/librarian_catalog_view.dart';
 import 'package:flutter/material.dart';
 import 'package:biblioteca_unimet/viewmodels/auth_viewmodel.dart';
@@ -181,7 +181,7 @@ class LibrarianView extends StatelessWidget {
     }
   }
 
-  // Renderiza los bloques de accion rapida (Catalogo, Prestamos, Donaciones, Estadisticas)
+  // Renderiza los bloques de accion rapida (Catalogo, Prestamos, Sugerencias, Estadisticas)
   Widget _buildActionSection(BuildContext context, bool isDesktop) {
     List<Widget> actions = [
       _actionBlock(Icons.menu_book, 'Catálogo', () {
@@ -191,44 +191,16 @@ class LibrarianView extends StatelessWidget {
         );
       }),
       _actionBlock(Icons.bookmark_added, 'Gestión y Préstamos', () {}),
-      _actionBlock(Icons.volunteer_activism, 'Donaciones', () {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15),
-              ),
-              title: const Text('Redirección a página de pagos'),
-              content: const Text(
-                'Está a punto de ser redirigido a la plataforma de PayPal para continuar con su donación.',
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text(
-                    'Cancelar',
-                    style: TextStyle(color: Colors.grey),
-                  ),
-                ),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: kOrange),
-                  onPressed: () {
-                    Navigator.pop(context);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const DonationView(),
-                      ),
-                    );
-                  },
-                  child: const Text('Continuar'),
-                ),
-              ],
-            );
-          },
+      
+      _actionBlock(Icons.inbox, 'Sugerencias', () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const ListaSugerenciasView(),
+          ),
         );
       }),
+      
       _actionBlock(Icons.bar_chart, 'Estadísticas', () {
         // Botón no funcional por ahora.
       }),
