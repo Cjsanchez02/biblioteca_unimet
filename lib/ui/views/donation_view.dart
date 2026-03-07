@@ -5,6 +5,7 @@ class DonationView extends StatefulWidget {
   const DonationView({super.key});
 
   @override
+  @override
   State<DonationView> createState() => _DonationViewState();
 }
 
@@ -13,9 +14,51 @@ class _DonationViewState extends State<DonationView> {
   final ServicioDonaciones _servicioDonaciones = ServicioDonaciones();
 
   // Variables para el monto y moneda
+  final TextEditingController _montoController = TextEditingController();
   double _monto = 0.0;
   String _monedaSeleccionada = 'USD';
   final List<String> _monedas = ['USD', 'EUR', 'VES'];
+
+  @override
+  void initState() {
+    super.initState();
+    _montoController.addListener(() {
+      final String text = _montoController.text;
+      if (text.isEmpty) {
+        setState(() => _monto = 0.0);
+        return;
+      }
+
+      // Intentamos validar el número.
+      // Si contiene letras o más de un punto, tryParse devolverá null.
+      final double? valorValidado = double.tryParse(text);
+
+      if (valorValidado == null) {
+        // ERROR: El texto contiene caracteres no numéricos.
+        // Eliminamos el último carácter introducido.
+        final String filtrado = text.substring(0, text.length - 1);
+
+        // Usamos una micro-tarea para evitar errores de colisión en el renderizado
+        Future.microtask(() {
+          _montoController.value = TextEditingValue(
+            text: filtrado,
+            selection: TextSelection.collapsed(offset: filtrado.length),
+          );
+        });
+      } else {
+        // ÉXITO: Es un número válido. Actualizamos el estado para el botón.
+        setState(() {
+          _monto = valorValidado;
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _montoController.dispose();
+    super.dispose();
+  }
 
   void _processPayment() async {
     setState(() => _isProcessing = true);
@@ -44,7 +87,15 @@ class _DonationViewState extends State<DonationView> {
           color: Color(0xFF0070BA),
           size: 60,
         ),
+        icon: const Icon(
+          Icons.check_circle,
+          color: Color(0xFF0070BA),
+          size: 60,
+        ),
         title: const Text('Confirmación de Envío'),
+        content: Text(
+          'Has donado exitosamente $_monto $_monedaSeleccionada a la Biblioteca Unimet.',
+        ),
         content: Text(
           'Has donado exitosamente $_monto $_monedaSeleccionada a la Biblioteca Unimet.',
         ),
@@ -79,6 +130,7 @@ class _DonationViewState extends State<DonationView> {
         children: [
           Expanded(
             child: _isProcessing ? _buildProcessingState() : _buildPayPalFlow(),
+            child: _isProcessing ? _buildProcessingState() : _buildPayPalFlow(),
           ),
           _buildWarningBanner(),
         ],
@@ -99,8 +151,17 @@ class _DonationViewState extends State<DonationView> {
               color: Color(0xFF003087),
               size: 30,
             ),
+            child: Icon(
+              Icons.account_balance,
+              color: Color(0xFF003087),
+              size: 30,
+            ),
           ),
           const SizedBox(height: 15),
+          const Text(
+            'Donar a Biblioteca Unimet',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
           const Text(
             'Donar a Biblioteca Unimet',
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -121,6 +182,10 @@ class _DonationViewState extends State<DonationView> {
                   'Monto de la donación',
                   style: TextStyle(color: Colors.grey),
                 ),
+                const Text(
+                  'Monto de la donación',
+                  style: TextStyle(color: Colors.grey),
+                ),
                 const SizedBox(height: 10),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -129,7 +194,11 @@ class _DonationViewState extends State<DonationView> {
                     SizedBox(
                       width: 120,
                       child: TextField(
-                        keyboardType: TextInputType.number,
+                        controller:
+                            _montoController, // El controlador ahora hace todo el trabajo
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: true,
+                        ),
                         textAlign: TextAlign.center,
                         style: const TextStyle(
                           fontSize: 32,
@@ -156,7 +225,16 @@ class _DonationViewState extends State<DonationView> {
                         color: Colors.black,
                         fontWeight: FontWeight.bold,
                       ),
+                      style: const TextStyle(
+                        fontSize: 20,
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                      ),
                       items: _monedas.map((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
                         return DropdownMenuItem<String>(
                           value: value,
                           child: Text(value),
@@ -183,10 +261,18 @@ class _DonationViewState extends State<DonationView> {
               'Pagar con',
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
+            child: Text(
+              'Pagar con',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
           ),
           const SizedBox(height: 10),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10),
+            ),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(10),
@@ -198,6 +284,14 @@ class _DonationViewState extends State<DonationView> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Text(
+                      'Visa •••• 4242',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      'Tarjeta de crédito principal',
+                      style: TextStyle(fontSize: 12, color: Colors.grey),
+                    ),
                     Text(
                       'Visa •••• 4242',
                       style: TextStyle(fontWeight: FontWeight.bold),
@@ -231,10 +325,18 @@ class _DonationViewState extends State<DonationView> {
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
                 ),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ),
           const SizedBox(height: 15),
+          const Text(
+            'Transacción protegida por PayPal',
+            style: TextStyle(fontSize: 12, color: Colors.grey),
+          ),
           const Text(
             'Transacción protegida por PayPal',
             style: TextStyle(fontSize: 12, color: Colors.grey),
@@ -256,6 +358,10 @@ class _DonationViewState extends State<DonationView> {
             'Conectando con PayPal...',
             style: TextStyle(fontWeight: FontWeight.w500),
           ),
+          Text(
+            'Conectando con PayPal...',
+            style: TextStyle(fontWeight: FontWeight.w500),
+          ),
         ],
       ),
     );
@@ -270,6 +376,11 @@ class _DonationViewState extends State<DonationView> {
       child: const Text(
         'ESTA ES UNA SIMULACIÓN. Ningún cargo será realizado.',
         textAlign: TextAlign.center,
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 11,
+          fontWeight: FontWeight.bold,
+        ),
         style: TextStyle(
           color: Colors.white,
           fontSize: 11,
