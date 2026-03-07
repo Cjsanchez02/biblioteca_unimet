@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:biblioteca_unimet/services/servicio_calificaciones.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class CalificacionViewModel extends ChangeNotifier {
   final ServicioCalificaciones _servicio = ServicioCalificaciones();
@@ -16,7 +17,7 @@ class CalificacionViewModel extends ChangeNotifier {
     required String comentario,
     required BuildContext context,
   }) async {
-    // Activamos la carga y notificamos a la Vista (Observer)
+    // Patrón Oberver
     _isLoading = true;
     notifyListeners();
 
@@ -29,6 +30,11 @@ class CalificacionViewModel extends ChangeNotifier {
         comentario: comentario,
       );
       
+      await FirebaseFirestore.instance
+          .collection('prestamos')
+          .doc(transaccionId)
+          .update({'calificado': true});
+
       _isLoading = false;
       notifyListeners();
 

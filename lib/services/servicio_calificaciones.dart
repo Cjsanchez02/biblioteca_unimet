@@ -22,8 +22,9 @@ class ServicioCalificaciones {
       carreraEstudiante = (userDoc.data() as Map<String, dynamic>)['carrera'] ?? 'No especificada';
     }
 
-    final docMaterialRef = _db.collection('materiales').doc(materialId);
-    final docCalificacionRef = docMaterialRef.collection('calificaciones').doc(user.uid); // Voto único
+
+    final docMaterialRef = _db.collection('material_academico').doc(materialId);
+    final docCalificacionRef = docMaterialRef.collection('calificaciones').doc(user.uid); 
 
     // 2. Transacción para actualizar promedios de forma segura
     await _db.runTransaction((transaction) async {
@@ -32,24 +33,29 @@ class ServicioCalificaciones {
 
       if (!materialSnap.exists) throw Exception('Material no encontrado');
 
-      double promedioActual = (materialSnap.data() as Map<String, dynamic>)['calificacionPromedio']?.toDouble() ?? 0.0;
-      int totalVotos = (materialSnap.data() as Map<String, dynamic>)['totalVotos']?.toInt() ?? 0;
+      final dataMaterial = materialSnap.data() as Map<String, dynamic>;
+
+      double promedioActual = (dataMaterial['calificacionPromedio'] as num?)?.toDouble() ?? 0.0;
+      int totalVotos = (dataMaterial['totalVotos'] as num?)?.toInt() ?? 0;
 
       double nuevoPromedio;
       int nuevoTotalVotos = totalVotos;
 
       if (votoAnteriorSnap.exists) {
-        // Actualiza su voto anterior
-        double estrellasAnteriores = (votoAnteriorSnap.data() as Map<String, dynamic>)['estrellasLibro'].toDouble();
+        final dataVotoAnterior = votoAnteriorSnap.data() as Map<String, dynamic>;
+        double estrellasAnteriores = (dataVotoAnterior['estrellasLibro'] as num).toDouble();
+        
+        // Fórmula para actualizar el promedio sin sumar un voto extra
         double sumaCorregida = (promedioActual * totalVotos) - estrellasAnteriores + estrellasLibro;
-        nuevoPromedio = sumaCorregida / totalVotos;
+        // Evitamos división por cero por si la BD estaba en un estado extraño
+        nuevoPromedio = totalVotos > 0 ? sumaCorregida / totalVotos : estrellasLibro; 
       } else {
         // Voto totalmente nuevo
         nuevoTotalVotos += 1;
         nuevoPromedio = ((promedioActual * totalVotos) + estrellasLibro) / nuevoTotalVotos;
       }
 
-      // Guardamos la calificación con la CARRERA incluida para tus gráficos
+      // Guardamos la calificación
       transaction.set(docCalificacionRef, {
         'estrellasLibro': estrellasLibro,
         'estrellasProceso': estrellasProceso,

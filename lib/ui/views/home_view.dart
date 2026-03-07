@@ -6,6 +6,8 @@ import 'package:biblioteca_unimet/viewmodels/auth_viewmodel.dart';
 import 'package:biblioteca_unimet/ui/views/edit_profile_view.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:biblioteca_unimet/viewmodels/sugerencia_viewmodel.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:biblioteca_unimet/ui/widgets/dialog_calification.dart';
 
 
 class HomeView extends StatefulWidget {
@@ -23,6 +25,48 @@ class _HomeViewState extends State<HomeView> {
   // Construye la estructura principal
   final TextEditingController _sugerenciaController = TextEditingController();
   final HomeViewModel _viewModel = HomeViewModel();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final usuarioActual = FirebaseAuth.instance.currentUser;
+      if (usuarioActual != null && usuarioActual.email != null) {
+        _verificarCalificacionesPendientes(context, usuarioActual.email!);
+      }
+    });
+  }
+
+  // La función que busca en Firebase y lanza el pop-up
+  Future<void> _verificarCalificacionesPendientes(BuildContext context, String correoUsuario) async {
+    final db = FirebaseFirestore.instance;
+    
+    // Buscamos los préstamos de este estudiante marcados como 'devuelto'
+    final pendientes = await db.collection('prestamos')
+        .where('correoSolicitante', isEqualTo: correoUsuario)
+        .where('estado', isEqualTo: 'devuelto')
+        .get();
+
+    for (var doc in pendientes.docs) {
+      final data = doc.data();
+      
+      // Verificamos si ya existe la bandera 'calificado' y si es true
+      bool yaFueCalificado = data.containsKey('calificado') ? data['calificado'] : false;
+
+      // Si no ha sido calificado, mostramos el Dialog
+      if (!yaFueCalificado && context.mounted) {
+        await showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (_) => DialogoCalificacion(
+            materialId: data['materialId'],
+            transaccionId: doc.id,
+            tituloLibro: data['tituloMaterial'],
+          ),
+        );
+      }
+    }
+  }
 
   @override
   void dispose() {

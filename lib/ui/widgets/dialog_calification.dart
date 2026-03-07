@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:biblioteca_unimet/viewmodels/calificacion_viewmodel.dart';
 
 class DialogoCalificacion extends StatefulWidget {
@@ -104,7 +105,14 @@ class _DialogoCalificacionState extends State<DialogoCalificacion> {
               ? [] 
               : [
                   TextButton(
-                    onPressed: () => Navigator.of(context).pop(), // Cierra sin hacer nada
+                    onPressed: () async {
+                      await FirebaseFirestore.instance
+                          .collection('prestamos')
+                          .doc(widget.transaccionId)
+                          .update({'calificado': true});
+                      
+                      if (context.mounted) Navigator.of(context).pop();
+                    },
                     child: const Text('Omitir', style: TextStyle(color: Colors.grey)),
                   ),
                   ElevatedButton(
@@ -123,7 +131,6 @@ class _DialogoCalificacionState extends State<DialogoCalificacion> {
                         context: context,
                       );
                       
-                      // Si todo salió bien, cerramos el cuadro
                       if (exito && mounted) {
                         Navigator.of(context).pop();
                       }
