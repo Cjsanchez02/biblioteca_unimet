@@ -3,6 +3,7 @@ import 'package:biblioteca_unimet/ui/views/donation_view.dart';
 import 'package:flutter/material.dart';
 import 'package:biblioteca_unimet/viewmodels/auth_viewmodel.dart';
 import 'package:biblioteca_unimet/ui/views/edit_profile_view.dart';
+import 'package:biblioteca_unimet/ui/views/estadisticas_view.dart';
 
 class AdminView extends StatelessWidget {
   const AdminView({super.key});
@@ -230,7 +231,14 @@ class AdminView extends StatelessWidget {
         );
       }),
       _actionBlock(Icons.manage_accounts, 'Administrar Usuarios', () {}),
-      _actionBlock(Icons.query_stats, 'Estadísticas Globales', () {}),
+      _actionBlock(Icons.bar_chart, 'Estadísticas', () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const EstadisticasView(),
+          ),
+        );
+      }),
     ];
 
     if (isDesktop) {

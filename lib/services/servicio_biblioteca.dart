@@ -26,6 +26,27 @@ class BibliotecaService {
         return false; 
       }
 
+      String carreraFinal = 'No especificada';
+
+      final usuarioQuery = await _db.collection('usuarios')
+          .where('email', isEqualTo: correoUsuario)
+          .limit(1) // Solo necesitamos un resultado
+          .get();
+
+      if (usuarioQuery.docs.isNotEmpty) {
+        // Extraemos los datos del documento del usuario
+        Map<String, dynamic> userData = usuarioQuery.docs.first.data();
+        String rolUsuario = userData['rol'] ?? 'estudiante';
+
+        // Aplicamos tu condicional:
+        if (rolUsuario == 'empleado' || rolUsuario == 'profesor') {
+          carreraFinal = rolUsuario; // Si es empleado o profesor, se coloca eso
+        } else {
+          // Si es estudiante, tomamos su carrera de la base de datos
+          // Asegúrate de que al registrar al estudiante le guardes un campo 'carrera'
+          carreraFinal = userData['carrera'] ?? 'Sin carrera registrada';
+        }
+      }
       
       final nuevoPrestamo = Prestamo(
         id: '', // Firebase
@@ -34,6 +55,8 @@ class BibliotecaService {
         fechaDevolucion: DateTime.now().add(const Duration(days: 7)),
         materialId: libro.id,
         tituloMaterial: libro.titulo,
+        carrera: carreraFinal,     
+        materia: libro.materia,
         estado: 'solicitado',
       );
 

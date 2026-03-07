@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:biblioteca_unimet/viewmodels/auth_viewmodel.dart';
 import 'package:biblioteca_unimet/ui/views/edit_profile_view.dart';
 import 'package:biblioteca_unimet/ui/views/librarian_prestamos_view.dart';
+import 'package:biblioteca_unimet/ui/views/estadisticas_view.dart';
 
 class LibrarianView extends StatelessWidget {
   const LibrarianView({super.key});
@@ -206,7 +207,12 @@ class LibrarianView extends StatelessWidget {
       }),
       
       _actionBlock(Icons.bar_chart, 'Estadísticas', () {
-        // Botón no funcional por ahora.
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const EstadisticasView(),
+          ),
+        );
       }),
     ];
 
