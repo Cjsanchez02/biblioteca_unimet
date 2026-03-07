@@ -1,16 +1,15 @@
 import 'package:biblioteca_unimet/ui/views/donation_view.dart';
 import 'package:flutter/material.dart';
-import 'package:biblioteca_unimet/viewmodels/auth_viewmodel.dart';
-import 'package:biblioteca_unimet/ui/views/edit_profile_view.dart';
+import 'package:biblioteca_unimet/ui/views/login_view.dart';
 
-class LibrarianView extends StatefulWidget {
-  const LibrarianView({super.key});
+class GeneralUsersView extends StatefulWidget {
+  const GeneralUsersView({super.key});
 
   @override
-  State<LibrarianView> createState() => _LibrarianViewState();
+  State<GeneralUsersView> createState() => _GeneralUsersViewState();
 }
 
-class _LibrarianViewState extends State<LibrarianView> {
+class _GeneralUsersViewState extends State<GeneralUsersView> {
   static const Color kOrange = Color(0xFFF7941D);
   static const Color kDarkGray = Color(0xFF333333);
   static const Color kLightGray = Color(0xFFF4F4F4);
@@ -64,7 +63,7 @@ class _LibrarianViewState extends State<LibrarianView> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           const Text(
-            'MetroShare - Bibliotecario',
+            'Biblioteca Unimet',
             style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.bold,
@@ -75,20 +74,12 @@ class _LibrarianViewState extends State<LibrarianView> {
             Row(
               children: [
                 _navItem('Inicio', () {}),
-                _navItem('Editar Perfil', () {
+                _navItem('Servicios', () {}),
+                _navItem('Contactanos', () {}),
+                _navItem('Iniciar Sesión', () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                      builder: (context) => const EditProfileView(),
-                    ),
-                  );
-                }),
-                _navItem('Cerrar Sesión', () {
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return _dialogoCerrarSesion(context);
-                    },
+                    MaterialPageRoute(builder: (context) => const LoginView()),
                   );
                 }),
               ],
@@ -130,9 +121,9 @@ class _LibrarianViewState extends State<LibrarianView> {
               height: 1.1,
             ),
             children: [
-              TextSpan(text: 'Panel de\nGestión '),
+              TextSpan(text: 'Un Puente entre\nsiglos de '),
               TextSpan(
-                text: 'Bibliotecaria',
+                text: 'saber',
                 style: TextStyle(color: kOrange),
               ),
             ],
@@ -140,8 +131,16 @@ class _LibrarianViewState extends State<LibrarianView> {
         ),
         const SizedBox(height: 20),
         const Text(
-          'Administra con eficiencia el corazón de la Universidad Metropolitana. Desde este panel, tienes las herramientas necesarias para supervisar el flujo de conocimiento: gestiona el catálogo completo, monitorea los préstamos activos de los estudiantes, analiza las métricas de uso y asegura que cada recurso esté al alcance de nuestra comunidad académica.',
-          style: TextStyle(fontSize: 20, color: Colors.black54, height: 1.6),
+          'Accede a miles de recursos academicos, gestiona tus prestamos y contribuye con el desarrollo estudiantil a traves de donaciones.',
+          style: TextStyle(fontSize: 18, color: Colors.black54, height: 1.5),
+        ),
+        const SizedBox(height: 40),
+        _GeneralUsersActionCard(
+          title: 'Explorar Biblioteca',
+          icon: Icons.search,
+          onTap: () {},
+          isSmall: true,
+          paddingHorizontal: 40,
         ),
       ],
     );
@@ -182,17 +181,12 @@ class _LibrarianViewState extends State<LibrarianView> {
 
   Widget _buildActionSection(BuildContext context, bool isDesktop) {
     List<Widget> actions = [
-      _LibrarianActionCard(
+      _GeneralUsersActionCard(
         icon: Icons.menu_book,
-        title: 'Catálogo',
+        title: 'Catalogo',
         onTap: () {},
       ),
-      _LibrarianActionCard(
-        icon: Icons.bookmark_added,
-        title: 'Gestión y Préstamos',
-        onTap: () {},
-      ),
-      _LibrarianActionCard(
+      _GeneralUsersActionCard(
         icon: Icons.volunteer_activism,
         title: 'Donaciones',
         onTap: () {
@@ -234,11 +228,6 @@ class _LibrarianViewState extends State<LibrarianView> {
           );
         },
       ),
-      _LibrarianActionCard(
-        icon: Icons.query_stats,
-        title: 'Estadísticas',
-        onTap: () {},
-      ),
     ];
 
     if (isDesktop) {
@@ -248,7 +237,7 @@ class _LibrarianViewState extends State<LibrarianView> {
             .map(
               (a) => Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
                   child: a,
                 ),
               ),
@@ -306,7 +295,7 @@ class _LibrarianViewState extends State<LibrarianView> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                'Consultas Técnicas',
+                '¿Necesitas ayuda?',
                 style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
@@ -315,7 +304,7 @@ class _LibrarianViewState extends State<LibrarianView> {
               ),
               const SizedBox(height: 10),
               const Text(
-                'Contacta al administrador para reportar problemas.',
+                'Habla con nuestro bibliotecario.',
                 style: TextStyle(fontSize: 16, color: Colors.black54),
               ),
             ],
@@ -327,7 +316,14 @@ class _LibrarianViewState extends State<LibrarianView> {
           child: CircleAvatar(
             radius: 30,
             backgroundColor: kDarkGray,
-            child: const Icon(Icons.support_agent, color: Colors.white),
+            child: const Text(
+              '?',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
         ),
       ],
@@ -348,62 +344,29 @@ class _LibrarianViewState extends State<LibrarianView> {
       );
     }
   }
-
-  Widget _dialogoCerrCerrarSesion(BuildContext context) {
-    return AlertDialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-      title: const Row(
-        children: [
-          Icon(Icons.warning_amber_outlined, color: kOrange),
-          SizedBox(width: 10),
-          Text('Cerrar Sesión'),
-        ],
-      ),
-      content: const Text('¿Estás seguro de que deseas cerrar sesión?'),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('Cancelar', style: TextStyle(color: Colors.black)),
-        ),
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(backgroundColor: kOrange),
-          onPressed: () async {
-            Navigator.pop(context);
-            final vm = AuthViewModel();
-            await vm.cerrarSesion(context);
-          },
-          child: const Text(
-            'Cerrar Sesión',
-            style: TextStyle(color: Colors.black),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _dialogoCerrarSesion(BuildContext context) {
-    return _dialogoCerrCerrarSesion(context);
-  }
 }
 
-class _LibrarianActionCard extends StatefulWidget {
+class _GeneralUsersActionCard extends StatefulWidget {
   final IconData icon;
   final String title;
   final VoidCallback onTap;
   final bool isSmall;
+  final double paddingHorizontal;
 
-  const _LibrarianActionCard({
+  const _GeneralUsersActionCard({
     required this.icon,
     required this.title,
     required this.onTap,
     this.isSmall = false,
+    this.paddingHorizontal = 0,
   });
 
   @override
-  State<_LibrarianActionCard> createState() => _LibrarianActionCardState();
+  State<_GeneralUsersActionCard> createState() =>
+      _GeneralUsersActionCardState();
 }
 
-class _LibrarianActionCardState extends State<_LibrarianActionCard> {
+class _GeneralUsersActionCardState extends State<_GeneralUsersActionCard> {
   bool _isHovered = false;
 
   @override
@@ -426,40 +389,41 @@ class _LibrarianActionCardState extends State<_LibrarianActionCard> {
                   widget.icon,
                   size: 50,
                   color: _isHovered
-                      ? _LibrarianViewState.kOrange
+                      ? _GeneralUsersViewState.kOrange
                       : Colors.black,
                 ),
                 const SizedBox(height: 15),
               ],
-              SizedBox(
-                width: double.infinity,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  decoration: BoxDecoration(
-                    color: _isHovered
-                        ? _LibrarianViewState.kDarkGray
-                        : _LibrarianViewState.kOrange,
-                    borderRadius: BorderRadius.circular(8),
-                    boxShadow: _isHovered
-                        ? [
-                            BoxShadow(
-                              color: _LibrarianViewState.kOrange.withOpacity(
-                                0.3,
-                              ),
-                              blurRadius: 15,
-                              offset: const Offset(0, 8),
+              Container(
+                width: widget.paddingHorizontal > 0 ? null : double.infinity,
+                padding: EdgeInsets.symmetric(
+                  vertical: 16,
+                  horizontal: widget.paddingHorizontal,
+                ),
+                decoration: BoxDecoration(
+                  color: _isHovered
+                      ? _GeneralUsersViewState.kDarkGray
+                      : _GeneralUsersViewState.kOrange,
+                  borderRadius: BorderRadius.circular(8),
+                  boxShadow: _isHovered
+                      ? [
+                          BoxShadow(
+                            color: _GeneralUsersViewState.kOrange.withOpacity(
+                              0.3,
                             ),
-                          ]
-                        : [],
-                  ),
-                  child: Center(
-                    child: Text(
-                      widget.title,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
+                            blurRadius: 15,
+                            offset: const Offset(0, 8),
+                          ),
+                        ]
+                      : [],
+                ),
+                child: Center(
+                  child: Text(
+                    widget.title,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
                     ),
                   ),
                 ),

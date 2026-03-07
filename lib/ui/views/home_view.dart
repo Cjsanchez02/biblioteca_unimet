@@ -3,14 +3,18 @@ import 'package:flutter/material.dart';
 import 'package:biblioteca_unimet/viewmodels/auth_viewmodel.dart';
 import 'package:biblioteca_unimet/ui/views/edit_profile_view.dart';
 
-class HomeView extends StatelessWidget {
+class HomeView extends StatefulWidget {
   const HomeView({super.key});
 
+  @override
+  State<HomeView> createState() => _HomeViewState();
+}
+
+class _HomeViewState extends State<HomeView> {
   static const Color kOrange = Color(0xFFF7941D);
   static const Color kDarkGray = Color(0xFF333333);
   static const Color kLightGray = Color(0xFFF4F4F4);
 
-  // Construye la estructura principal
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -49,7 +53,6 @@ class HomeView extends StatelessWidget {
     );
   }
 
-  // Genera la barra de navegacion superior
   Widget _buildNavbar(bool isDesktop, BuildContext context) {
     return Container(
       padding: EdgeInsets.symmetric(
@@ -82,7 +85,6 @@ class HomeView extends StatelessWidget {
                     ),
                   );
                 }),
-
                 _navItem('Cerrar Sesión', () {
                   showDialog(
                     context: context,
@@ -100,7 +102,6 @@ class HomeView extends StatelessWidget {
     );
   }
 
-  // Crea un enlace de texto individual para el menu
   Widget _navItem(String title, VoidCallback onTap) {
     return Padding(
       padding: const EdgeInsets.only(left: 30),
@@ -118,7 +119,6 @@ class HomeView extends StatelessWidget {
     );
   }
 
-  // Construye la seccion principal con el mensaje de bienvenida y la primera imagen
   Widget _buildHeroSection(bool isDesktop) {
     Widget textContent = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -146,19 +146,12 @@ class HomeView extends StatelessWidget {
           style: TextStyle(fontSize: 18, color: Colors.black54, height: 1.5),
         ),
         const SizedBox(height: 40),
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: kOrange,
-            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-          onPressed: () {},
-          child: const Text(
-            'Explorar Biblioteca',
-            style: TextStyle(fontSize: 18, color: Colors.white),
-          ),
+        _HomeActionCard(
+          title: 'Explorar Biblioteca',
+          icon: Icons.search,
+          onTap: () {},
+          isSmall: true,
+          paddingHorizontal: 40,
         ),
       ],
     );
@@ -197,49 +190,56 @@ class HomeView extends StatelessWidget {
     }
   }
 
-  // Renderiza los bloques de accion rapida (Catalogo, Prestamos, Donaciones)
   Widget _buildActionSection(BuildContext context, bool isDesktop) {
     List<Widget> actions = [
-      _actionBlock(Icons.menu_book, 'Catalogo', () {}),
-      _actionBlock(Icons.bookmark_added, 'Gestion y Prestamos', () {}),
-      _actionBlock(Icons.volunteer_activism, 'Donaciones', () {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15),
-              ),
-              title: const Text('Redirección a página de pagos'),
-              content: const Text(
-                'Está a punto de ser redirigido a la plataforma de PayPal para continuar con su donación.',
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context), // Cierra el pop-up
-                  child: const Text(
-                    'Cancelar',
-                    style: TextStyle(color: Colors.grey),
+      _HomeActionCard(icon: Icons.menu_book, title: 'Catalogo', onTap: () {}),
+      _HomeActionCard(
+        icon: Icons.bookmark_added,
+        title: 'Gestion y Prestamos',
+        onTap: () {},
+      ),
+      _HomeActionCard(
+        icon: Icons.volunteer_activism,
+        title: 'Donaciones',
+        onTap: () {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                title: const Text('Redirección a página de pagos'),
+                content: const Text(
+                  'Está a punto de ser redirigido a la plataforma de PayPal para continuar con su donación.',
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text(
+                      'Cancelar',
+                      style: TextStyle(color: Colors.grey),
+                    ),
                   ),
-                ),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: kOrange),
-                  onPressed: () {
-                    Navigator.pop(context);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const DonationView(),
-                      ),
-                    );
-                  },
-                  child: const Text('Continuar'),
-                ),
-              ],
-            );
-          },
-        );
-      }),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(backgroundColor: kOrange),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const DonationView(),
+                        ),
+                      );
+                    },
+                    child: const Text('Continuar'),
+                  ),
+                ],
+              );
+            },
+          );
+        },
+      ),
     ];
 
     if (isDesktop) {
@@ -267,40 +267,6 @@ class HomeView extends StatelessWidget {
       );
     }
   }
-
-  // Crea el diseno individual de cada boton de accion con su icono
-  Widget _actionBlock(IconData icon, String title, VoidCallback onTap) {
-    return Column(
-      children: [
-        Icon(icon, size: 60, color: Colors.black),
-        const SizedBox(height: 20),
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: kOrange,
-              padding: const EdgeInsets.symmetric(vertical: 20),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-            onPressed: onTap,
-            child: Text(
-              title,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  // Construye la seccion inferior que contiene la segunda imagen
-  // y el formulario de contacto
 
   Widget _buildFooterSection(bool isDesktop) {
     Widget imageContent = Container(
@@ -352,42 +318,6 @@ class HomeView extends StatelessWidget {
               const Text(
                 'Habla con nuestro bibliotecario.',
                 style: TextStyle(fontSize: 16, color: Colors.black54),
-              ),
-              const SizedBox(height: 30),
-              TextField(
-                maxLines: 4,
-                decoration: InputDecoration(
-                  hintText: 'Escribe tu mensaje aqui...',
-                  hintStyle: const TextStyle(color: Colors.black38),
-                  filled: true,
-                  fillColor: kLightGray,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: kOrange,
-                    padding: const EdgeInsets.symmetric(vertical: 20),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  onPressed: () {},
-                  child: const Text(
-                    'Enviar mensaje',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
               ),
             ],
           ),
@@ -456,6 +386,91 @@ class HomeView extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _HomeActionCard extends StatefulWidget {
+  final IconData icon;
+  final String title;
+  final VoidCallback onTap;
+  final bool isSmall;
+  final double paddingHorizontal;
+
+  const _HomeActionCard({
+    required this.icon,
+    required this.title,
+    required this.onTap,
+    this.isSmall = false,
+    this.paddingHorizontal = 0,
+  });
+
+  @override
+  State<_HomeActionCard> createState() => _HomeActionCardState();
+}
+
+class _HomeActionCardState extends State<_HomeActionCard> {
+  bool _isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: widget.onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 250),
+          transform: Matrix4.identity()..scale(_isHovered ? 1.05 : 1.0),
+          curve: Curves.easeOutBack,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (!widget.isSmall) ...[
+                Icon(
+                  widget.icon,
+                  size: 50,
+                  color: _isHovered ? _HomeViewState.kOrange : Colors.black,
+                ),
+                const SizedBox(height: 15),
+              ],
+              Container(
+                width: widget.paddingHorizontal > 0 ? null : double.infinity,
+                padding: EdgeInsets.symmetric(
+                  vertical: 16,
+                  horizontal: widget.paddingHorizontal,
+                ),
+                decoration: BoxDecoration(
+                  color: _isHovered
+                      ? _HomeViewState.kDarkGray
+                      : _HomeViewState.kOrange,
+                  borderRadius: BorderRadius.circular(8),
+                  boxShadow: _isHovered
+                      ? [
+                          BoxShadow(
+                            color: _HomeViewState.kOrange.withOpacity(0.3),
+                            blurRadius: 15,
+                            offset: const Offset(0, 8),
+                          ),
+                        ]
+                      : [],
+                ),
+                child: Center(
+                  child: Text(
+                    widget.title,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

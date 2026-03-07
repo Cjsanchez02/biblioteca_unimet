@@ -1,4 +1,6 @@
-import 'package:biblioteca_unimet/ui/views/donation_view.dart';
+import 'package:biblioteca_unimet/ui/views/admin_users_view.dart';
+import 'package:biblioteca_unimet/ui/views/admin_donations_view.dart';
+
 import 'package:flutter/material.dart';
 import 'package:biblioteca_unimet/viewmodels/auth_viewmodel.dart';
 import 'package:biblioteca_unimet/ui/views/edit_profile_view.dart';
@@ -10,7 +12,6 @@ class AdminView extends StatelessWidget {
   static const Color kDarkGray = Color(0xFF333333);
   static const Color kLightGray = Color(0xFFF4F4F4);
 
-  // Construye la estructura principal
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,7 +37,7 @@ class AdminView extends StatelessWidget {
                       const SizedBox(height: 60),
                       const Divider(thickness: 1, color: Colors.black12),
                       const SizedBox(height: 60),
-                      _buildFooterSection(isDesktop),
+                      _buildFooterSection(isDesktop, context),
                       const SizedBox(height: 60),
                     ],
                   ),
@@ -49,7 +50,6 @@ class AdminView extends StatelessWidget {
     );
   }
 
-  // Genera la barra de navegacion superior
   Widget _buildNavbar(bool isDesktop, BuildContext context) {
     return Container(
       padding: EdgeInsets.symmetric(
@@ -80,7 +80,6 @@ class AdminView extends StatelessWidget {
                     ),
                   );
                 }),
-
                 _navItem('Cerrar Sesión', () {
                   showDialog(
                     context: context,
@@ -98,7 +97,6 @@ class AdminView extends StatelessWidget {
     );
   }
 
-  // Crea un enlace de texto individual para el menu
   Widget _navItem(String title, VoidCallback onTap) {
     return Padding(
       padding: const EdgeInsets.only(left: 30),
@@ -116,7 +114,6 @@ class AdminView extends StatelessWidget {
     );
   }
 
-  // Construye la seccion principal con el mensaje de bienvenida y la primera imagen
   Widget _buildHeroSection(bool isDesktop) {
     Widget textContent = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -180,51 +177,39 @@ class AdminView extends StatelessWidget {
     }
   }
 
-  // Renderiza los bloques de accion rapida (Gestion Usuarios, Prestamos, Donaciones, Estadisticas)
   Widget _buildActionSection(BuildContext context, bool isDesktop) {
     List<Widget> actions = [
-      _actionBlock(Icons.menu_book, 'Catálogo', () {}),
-      _actionBlock(Icons.bookmark_added, 'Gestión y Préstamos', () {}),
-      _actionBlock(Icons.volunteer_activism, 'Donaciones', () {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15),
-              ),
-              title: const Text('Redirección a página de pagos'),
-              content: const Text(
-                'Está a punto de ser redirigido a la plataforma de PayPal para continuar con su donación.',
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text(
-                    'Cancelar',
-                    style: TextStyle(color: Colors.grey),
-                  ),
-                ),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: kOrange),
-                  onPressed: () {
-                    Navigator.pop(context);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const DonationView(),
-                      ),
-                    );
-                  },
-                  child: const Text('Continuar'),
-                ),
-              ],
-            );
-          },
-        );
-      }),
-      _actionBlock(Icons.manage_accounts, 'Administrar Usuarios', () {}),
-      _actionBlock(Icons.query_stats, 'Estadísticas Globales', () {}),
+      _AdminActionCard(icon: Icons.menu_book, title: 'Catálogo', onTap: () {}),
+      _AdminActionCard(
+        icon: Icons.bookmark_added,
+        title: 'Gestión y Préstamos',
+        onTap: () {},
+      ),
+      _AdminActionCard(
+        icon: Icons.volunteer_activism,
+        title: 'Ver Donaciones',
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const AdminDonationsView()),
+          );
+        },
+      ),
+      _AdminActionCard(
+        icon: Icons.manage_accounts,
+        title: 'Administrar Usuarios',
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const AdminUsersView()),
+          );
+        },
+      ),
+      _AdminActionCard(
+        icon: Icons.query_stats,
+        title: 'Estadísticas Globales',
+        onTap: () {},
+      ),
     ];
 
     if (isDesktop) {
@@ -253,41 +238,7 @@ class AdminView extends StatelessWidget {
     }
   }
 
-  // Crea el diseno individual de cada boton de accion con su icono
-  Widget _actionBlock(IconData icon, String title, VoidCallback onTap) {
-    return Column(
-      children: [
-        Icon(icon, size: 60, color: Colors.black),
-        const SizedBox(height: 20),
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: kOrange,
-              padding: const EdgeInsets.symmetric(vertical: 20),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-            onPressed: onTap,
-            child: Text(
-              title,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  // Construye la seccion inferior que contiene la segunda imagen
-  // y el formulario de contacto
-
-  Widget _buildFooterSection(bool isDesktop) {
+  Widget _buildFooterSection(bool isDesktop, BuildContext context) {
     Widget imageContent = Container(
       height: 350,
       width: double.infinity,
@@ -323,7 +274,7 @@ class AdminView extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'Reportes del Sistema',
+            'Panel de Administración',
             style: TextStyle(
               fontSize: 28,
               fontWeight: FontWeight.bold,
@@ -332,30 +283,8 @@ class AdminView extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           const Text(
-            'Consulta los reportes e incidencias técnicas recibidas.',
+            'Gestiona todos los aspectos del sistema bibliotecario.',
             style: TextStyle(fontSize: 16, color: Colors.black54),
-          ),
-          const SizedBox(height: 30),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: kOrange,
-                padding: const EdgeInsets.symmetric(vertical: 20),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              onPressed: () {},
-              child: const Text(
-                'Ver reportes',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-            ),
           ),
         ],
       ),
@@ -406,6 +335,81 @@ class AdminView extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _AdminActionCard extends StatefulWidget {
+  final IconData icon;
+  final String title;
+  final VoidCallback onTap;
+
+  const _AdminActionCard({
+    required this.icon,
+    required this.title,
+    required this.onTap,
+  });
+
+  @override
+  State<_AdminActionCard> createState() => _AdminActionCardState();
+}
+
+class _AdminActionCardState extends State<_AdminActionCard> {
+  bool _isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: widget.onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 250),
+          transform: Matrix4.identity()..scale(_isHovered ? 1.05 : 1.0),
+          curve: Curves.easeOutBack,
+          child: Column(
+            children: [
+              Icon(
+                widget.icon,
+                size: 38,
+                color: _isHovered ? AdminView.kOrange : Colors.black,
+              ),
+              const SizedBox(height: 15),
+              SizedBox(
+                width: double.infinity,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  decoration: BoxDecoration(
+                    color: _isHovered ? AdminView.kDarkGray : AdminView.kOrange,
+                    borderRadius: BorderRadius.circular(8),
+                    boxShadow: _isHovered
+                        ? [
+                            BoxShadow(
+                              color: AdminView.kOrange.withOpacity(0.3),
+                              blurRadius: 15,
+                              offset: const Offset(0, 8),
+                            ),
+                          ]
+                        : [],
+                  ),
+                  child: Center(
+                    child: Text(
+                      widget.title,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

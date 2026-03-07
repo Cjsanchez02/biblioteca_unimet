@@ -9,7 +9,7 @@ class AuthViewModel extends ChangeNotifier {
     try {
       await _authService.cerrarSesion();
       if (!context.mounted) return;
-      Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+      Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
     } catch (e) {
       _showErrorDialog(context, e.toString());
       rethrow;

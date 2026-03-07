@@ -144,6 +144,17 @@ class _EditProfileViewState extends State<EditProfileView> {
   /// Tambien actualiza el 'displayName' en Firebase Auth y la contrasena si se
   /// ingreso una nueva.
   Future<void> _saveUserData() async {
+    if (_nameController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('El nombre no puede estar vacío'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      setState(() => _isSaving = false);
+      return;
+    }
+
     setState(() => _isSaving = true);
 
     try {
