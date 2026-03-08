@@ -149,6 +149,23 @@ class _LibrarianCatalogViewState extends State<LibrarianCatalogView> {
   // Construye los items, mostrando información relevante
   Widget _itemMaterialBarra(Map<String, dynamic> material, int index) {
     int stockActual = material['stock'] ?? 0;
+    String tipo = material['tipo'] ?? 'Libro'; // Obtenemos el tipo
+    IconData iconoTipo;
+  switch (tipo) {
+    case 'Guía':
+      iconoTipo = Icons.assignment;
+      break;
+    case 'Revista':
+      iconoTipo = Icons.auto_stories;
+      break;
+    case 'Tesis':
+      iconoTipo = Icons.school;
+      break;
+    case 'Libro':
+    default:
+      iconoTipo = Icons.book;
+      break;
+  }
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 15),
       child: Row(
@@ -160,7 +177,7 @@ class _LibrarianCatalogViewState extends State<LibrarianCatalogView> {
             width: 60,
             height: 80,
             color: Colors.black,
-            child: const Icon(Icons.book, color: Colors.white, size: 30),
+            child: Icon(iconoTipo, color: Colors.white, size: 30),
           ),
           const SizedBox(width: 15),
           Expanded(
@@ -245,7 +262,7 @@ class _LibrarianCatalogViewState extends State<LibrarianCatalogView> {
         ),
         const SizedBox(height: 15),
         DropdownButtonFormField<String>(
-          value: _viewModel.criterio,
+          initialValue: _viewModel.criterio,
           decoration: const InputDecoration(
             filled: true,
             fillColor: Colors.white70,

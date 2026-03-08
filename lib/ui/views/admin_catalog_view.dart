@@ -154,6 +154,23 @@ class _AdminCatalogoViewState extends State<AdminCatalogView> {
   }
 // Construye los items, mostrando información relevante
   Widget _itemMaterialBarra(Map<String, dynamic> material, int index) {
+    String tipo = material['tipo'] ?? 'Libro'; // Obtenemos el tipo
+    IconData iconoTipo;
+  switch (tipo) {
+    case 'Guía':
+      iconoTipo = Icons.assignment;
+      break;
+    case 'Revista':
+      iconoTipo = Icons.auto_stories;
+      break;
+    case 'Tesis':
+      iconoTipo = Icons.school;
+      break;
+    case 'Libro':
+    default:
+      iconoTipo = Icons.book;
+      break;
+  }
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 15),
       child: Row(
@@ -166,7 +183,7 @@ class _AdminCatalogoViewState extends State<AdminCatalogView> {
             width: 60,
             height: 80,
             color: Colors.black,
-            child: const Icon(Icons.book, color: Colors.white, size: 30),
+            child: Icon(iconoTipo, color: Colors.white, size: 30),
           ),
           const SizedBox(width: 15),
           // Información central

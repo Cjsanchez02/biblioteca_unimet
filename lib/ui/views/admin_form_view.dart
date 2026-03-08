@@ -8,9 +8,9 @@ class AdminMaterialForm extends StatefulWidget {
   final Map<String, dynamic>? materialExistente; // Solo para editar/eliminar
 
   const AdminMaterialForm({
-    super.key, 
-    required this.modo, 
-    this.materialExistente
+    super.key,
+    required this.modo,
+    this.materialExistente,
   });
 
   @override
@@ -19,7 +19,7 @@ class AdminMaterialForm extends StatefulWidget {
 
 class _AdminMaterialFormState extends State<AdminMaterialForm> {
   final _formKey = GlobalKey<FormState>();
-  
+
   // Controladores
   final _tituloCtrl = TextEditingController();
   final _autorCtrl = TextEditingController();
@@ -37,13 +37,19 @@ class _AdminMaterialFormState extends State<AdminMaterialForm> {
       _materiaCtrl.text = widget.materialExistente!['materia'] ?? '';
       _stockCtrl.text = widget.materialExistente!['stock']?.toString() ?? '';
       _tipoSeleccionado = widget.materialExistente!['tipo'] ?? 'Libro';
+      final opcionesValidas = ['Libro', 'Guía', 'Revista', 'Tesis'];
+      _tipoSeleccionado = opcionesValidas.contains(_tipoSeleccionado)
+          ? _tipoSeleccionado
+          : 'Libro';
     }
   }
 
   // VALIDACIONES
   String? _validarTexto(String? value) {
     if (value == null || value.isEmpty) return 'Campo obligatorio';
-    if (RegExp(r'^[0-9]+$').hasMatch(value)) return 'No puede contener solo números';
+    if (RegExp(r'^[0-9]+$').hasMatch(value)) {
+      return 'No puede contener solo números';
+    }
     return null;
   }
 
@@ -67,11 +73,19 @@ class _AdminMaterialFormState extends State<AdminMaterialForm> {
             children: [
               // DROPDOWN PARA TIPO
               DropdownButtonFormField<String>(
-                initialValue: _tipoSeleccionado,
-                items: ['Libro', 'Guía', 'Revista', 'Tesis'].map((t) => 
-                  DropdownMenuItem(value: t, child: Text(t))).toList(),
-                onChanged: esEliminar ? null : (val) => setState(() => _tipoSeleccionado = val!),
-                decoration: const InputDecoration(labelText: 'Tipo de Material'),
+                initialValue:
+                    ['Libro','Guía','Revista','Tesis'].contains(_tipoSeleccionado)
+                    ? _tipoSeleccionado
+                    : 'Libro',
+                items: ['Libro', 'Guía', 'Revista', 'Tesis']
+                    .map((t) => DropdownMenuItem(value: t, child: Text(t)))
+                    .toList(),
+                onChanged: esEliminar
+                    ? null
+                    : (val) => setState(() => _tipoSeleccionado = val!),
+                decoration: const InputDecoration(
+                  labelText: 'Tipo de Material',
+                ),
               ),
               const SizedBox(height: 10),
               _buildTextField(_tituloCtrl, 'Título', _validarTexto, esEliminar),
@@ -83,19 +97,33 @@ class _AdminMaterialFormState extends State<AdminMaterialForm> {
         ),
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar', style: TextStyle(color: Colors.black))),
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancelar', style: TextStyle(color: Colors.black)),
+        ),
         ElevatedButton(
           style: ElevatedButton.styleFrom(
-            backgroundColor: esEliminar ? Colors.red : const Color(0xFFF7941D)
+            backgroundColor: esEliminar ? Colors.red : const Color(0xFFF7941D),
           ),
           onPressed: _procesarAccion,
-          child: Text(widget.modo == ModoFormulario.eliminar ? 'Confirmar Eliminar' : 'Guardar', style: const TextStyle(color: Colors.black)),
+          child: Text(
+            widget.modo == ModoFormulario.eliminar
+                ? 'Confirmar Eliminar'
+                : 'Guardar',
+            style: const TextStyle(color: Colors.black),
+          ),
         ),
       ],
     );
   }
 
-  Widget _buildTextField(TextEditingController ctrl, String label, String? Function(String?) validator, bool disabled, {TextInputType? keyboard}) {
+  Widget _buildTextField(
+    TextEditingController ctrl,
+    String label,
+    String? Function(String?) validator,
+    bool disabled, {
+    TextInputType? keyboard,
+  }) {
     return TextFormField(
       controller: ctrl,
       decoration: InputDecoration(labelText: label),
@@ -106,7 +134,9 @@ class _AdminMaterialFormState extends State<AdminMaterialForm> {
   }
 
   void _procesarAccion() async {
-    if (widget.modo != ModoFormulario.eliminar && !_formKey.currentState!.validate()) return;
+    if (widget.modo != ModoFormulario.eliminar &&
+        !_formKey.currentState!.validate())
+      return;
 
     final vm = MaterialViewModel();
     bool exito = false;
@@ -127,7 +157,9 @@ class _AdminMaterialFormState extends State<AdminMaterialForm> {
 
     if (exito && mounted) {
       Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Acción realizada con éxito")));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Acción realizada con éxito")));
     }
   }
 }

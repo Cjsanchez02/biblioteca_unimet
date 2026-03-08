@@ -130,6 +130,23 @@ class _UserCatalogViewState extends State<UserCatalogView> {
 // Construye los items, mostrando información relevante
   Widget _itemMaterialBarra(Map<String, dynamic> material, int index) {
     bool disponible = (material['stock'] ?? 0) > 0;
+    String tipo = material['tipo'] ?? 'Libro'; // Obtenemos el tipo
+    IconData iconoTipo;
+  switch (tipo) {
+    case 'Guía':
+      iconoTipo = Icons.assignment;
+      break;
+    case 'Revista':
+      iconoTipo = Icons.auto_stories;
+      break;
+    case 'Tesis':
+      iconoTipo = Icons.school;
+      break;
+    case 'Libro':
+    default:
+      iconoTipo = Icons.book;
+      break;
+  }
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 15),
       child: Row(
@@ -139,7 +156,7 @@ class _UserCatalogViewState extends State<UserCatalogView> {
           const SizedBox(width: 10),
           Container(
             width: 60, height: 80, color: Colors.black,
-            child: const Icon(Icons.book, color: Colors.white, size: 30),
+            child: Icon(iconoTipo, color: Colors.white, size: 30),
           ),
           const SizedBox(width: 15),
           Expanded(
