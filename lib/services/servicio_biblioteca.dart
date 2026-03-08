@@ -12,7 +12,7 @@ class BibliotecaService {
       final prestamosActivos = await _db.collection('prestamos')
           .where('correoSolicitante', isEqualTo: correoUsuario) // Filtramos por su correo
           .where('materialId', isEqualTo: libro.id)             // Filtramos por el ID del libro
-          .where('estado', isEqualTo: 'prestado')
+          .where('estado', isEqualTo: 'aprobado')
           .get(); 
 
       // Verificacion

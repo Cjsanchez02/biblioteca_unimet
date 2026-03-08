@@ -221,7 +221,7 @@ class _UserCatalogViewState extends State<UserCatalogView> {
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                            content: Text('Error: Ocurrió un problema o ya tienes este libro.'),
+                            content: Text('Ya tienes el libro en préstamo o no hay stock disponible.'),
                             backgroundColor: Colors.red,
                           ),
                         );
