@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:biblioteca_unimet/services/servicio_material.dart';
 import 'package:biblioteca_unimet/ui/views/admin_form_view.dart';
 import 'package:biblioteca_unimet/viewmodels/material_viewmodel.dart';
+import '../widgets/admin_navbar.dart';
 
 class AdminCatalogView extends StatefulWidget {
   const AdminCatalogView({super.key});
@@ -33,6 +34,8 @@ class _AdminCatalogoViewState extends State<AdminCatalogView> {
       ),
       body: Column(
         children: [
+          const AdminNavbar(activeTab: AdminTab.catalogo),
+          const Divider(height: 1),
           // Barra de búsqueda superior (Header)
           _buildSearchHeader(),
 

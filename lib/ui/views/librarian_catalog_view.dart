@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../widgets/custom_navbars.dart';
 import 'package:biblioteca_unimet/services/servicio_material.dart';
 import 'package:biblioteca_unimet/viewmodels/material_viewmodel.dart';
 
@@ -24,16 +25,10 @@ class _LibrarianCatalogViewState extends State<LibrarianCatalogView> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: const Text(
-          "Catálogo en línea - Modo Consulta (Bibliotecario)",
-          style: TextStyle(fontSize: 14, color: Colors.white),
-        ),
-        backgroundColor: kOrange,
-        iconTheme: const IconThemeData(color: Colors.white),
-      ),
       body: Column(
         children: [
+          const LibrarianNavbar(activeTab: LibrarianTab.catalogo),
+          const Divider(height: 1),
           _buildSearchHeader(),
           Expanded(
             child: Row(

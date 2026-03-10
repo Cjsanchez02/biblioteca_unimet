@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import '../../services/servicio_donaciones.dart';
+import '../widgets/custom_navbars.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class DonationView extends StatefulWidget {
   const DonationView({super.key});
 
-  @override
   @override
   State<DonationView> createState() => _DonationViewState();
 }
@@ -108,24 +110,40 @@ class _DonationViewState extends State<DonationView> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FA),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 1,
-        title: const Image(
-          image: AssetImage('images/logopaypal.png'),
-          height: 60,
-          fit: BoxFit.contain,
-        ),
-        centerTitle: true,
-      ),
       body: Column(
         children: [
+          _buildRoleNavbar(),
           Expanded(
             child: _isProcessing ? _buildProcessingState() : _buildPayPalFlow(),
           ),
           _buildWarningBanner(),
         ],
       ),
+    );
+  }
+
+  Widget _buildRoleNavbar() {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      return const HomeNavbar(activeTab: HomeTab.servicios);
+    }
+
+    return FutureBuilder<DocumentSnapshot>(
+      future: FirebaseFirestore.instance.collection('usuarios').doc(user.uid).get(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) return const SizedBox(height: 80); // Placeholder height
+        
+        final data = snapshot.data!.data() as Map<String, dynamic>?;
+        final role = data?['rol'] ?? 'Usuario Normal';
+
+        if (role == 'Bibliotecario') {
+          return const LibrarianNavbar(activeTab: LibrarianTab.inicio);
+        } else if (role == 'Administrador') {
+          return const SizedBox.shrink(); // AdminView has its own logic
+        } else {
+          return const UserNavbar(activeTab: UserTab.donaciones);
+        }
+      },
     );
   }
 

@@ -27,8 +27,13 @@ class _LoginViewState extends State<LoginView> {
       return;
     }
 
-    if (!email.endsWith('@correo.unimet.edu.ve')) {
-      _notificar("Solo se permiten correos @correo.unimet.edu.ve", Colors.red);
+    if (!UsuarioGeneral.validarPassword(password)) {
+      _notificar(UsuarioGeneral.mensajeErrorPassword, Colors.red);
+      return;
+    }
+
+    if (!email.endsWith('@correo.unimet.edu.ve') && !email.endsWith('@unimet.edu.ve')) {
+      _notificar("Solo se permiten correos @correo.unimet.edu.ve o @unimet.edu.ve", Colors.red);
       return;
     }
 
@@ -107,7 +112,7 @@ class _LoginViewState extends State<LoginView> {
               ),
               const SizedBox(height: 30),
               const Text(
-                "Inicia sesión con tu correo UNIMET",
+                "Inicia sesión con tu correo @correo.unimet.edu.ve o @unimet.edu.ve",
                 style: TextStyle(fontSize: 19, color: Color(0xFF666666)),
               ),
               const SizedBox(height: 30),

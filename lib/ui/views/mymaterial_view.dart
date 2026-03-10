@@ -1,6 +1,7 @@
 import 'package:biblioteca_unimet/services/servicio_biblioteca.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../widgets/custom_navbars.dart';
 
 class MisPrestamosView extends StatelessWidget {
   final String correoUsuario; // Para que muestre solo los préstamos de este usuario
@@ -15,22 +16,18 @@ class MisPrestamosView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: const Text(
-          'Mi Material',
-          style: TextStyle(color: kDarkGray, fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: Colors.white,
-        elevation: 1, 
-        iconTheme: const IconThemeData(color: kDarkGray),
-      ),
-      //Para que siempre este conectado con firebase y muestre los prestamos en tiempo real
-      body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance
-            .collection('prestamos')
-            .where('correoSolicitante', isEqualTo: correoUsuario)
-            .snapshots(), // Cambios en tiempo real
-        builder: (context, snapshot) {
+      body: Column(
+        children: [
+          const UserNavbar(activeTab: UserTab.prestamos),
+          const Divider(height: 1),
+          //Para que siempre este conectado con firebase y muestre los prestamos en tiempo real
+          Expanded(
+            child: StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('prestamos')
+                  .where('correoSolicitante', isEqualTo: correoUsuario)
+                  .snapshots(), // Cambios en tiempo real
+              builder: (context, snapshot) {
           // Mientras carga
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator(color: kOrange));
@@ -81,8 +78,11 @@ class MisPrestamosView extends StatelessWidget {
           );
         },
       ),
-    );
-  }
+    ),
+  ],
+),
+);
+}
 
   // Para cada libro
   Widget _buildTarjetaPrestamo(BuildContext context, String id, String titulo, String estado, String fecha) {

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
+import '../../models/UsuarioGeneral.dart';
 
 class EditProfileView extends StatefulWidget {
   const EditProfileView({super.key});
@@ -177,8 +178,8 @@ class _EditProfileViewState extends State<EditProfileView> {
 
         // NUEVA LOGICA: CAMBIAR CONTRASENA
         if (_passwordController.text.trim().isNotEmpty) {
-          if (_passwordController.text.trim().length < 6) {
-            throw Exception('La contraseña debe tener al menos 6 caracteres');
+          if (!UsuarioGeneral.validarPassword(_passwordController.text.trim())) {
+            throw Exception(UsuarioGeneral.mensajeErrorPassword);
           }
           await currentUser.updatePassword(_passwordController.text.trim());
           _passwordController.clear();

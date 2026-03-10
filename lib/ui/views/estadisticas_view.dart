@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:biblioteca_unimet/viewmodels/estadisticas_viewmodel.dart'; // Ajusta tu ruta
+import '../widgets/admin_navbar.dart';
+import '../widgets/custom_navbars.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class EstadisticasView extends StatelessWidget {
   const EstadisticasView({super.key});
@@ -15,14 +19,13 @@ class EstadisticasView extends StatelessWidget {
       create: (_) => EstadisticasViewModel(),
       child: Scaffold(
         backgroundColor: Colors.white,
-        appBar: AppBar(
-          title: const Text('Dashboard de Estadísticas', style: TextStyle(color: kDarkGray)),
-          backgroundColor: Colors.white,
-          iconTheme: const IconThemeData(color: kDarkGray),
-          elevation: 1,
-        ),
-        body: Consumer<EstadisticasViewModel>(
-          builder: (context, vm, child) {
+        body: Column(
+          children: [
+            _buildRoleNavbar(),
+            const Divider(height: 1),
+            Expanded(
+              child: Consumer<EstadisticasViewModel>(
+                builder: (context, vm, child) {
             return Padding(
               padding: const EdgeInsets.all(24.0),
               child: Column(
@@ -83,7 +86,10 @@ class EstadisticasView extends StatelessWidget {
                 ],
               ),
             );
-          },
+                },
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -210,6 +216,25 @@ class EstadisticasView extends StatelessWidget {
             ],
           ),
         );
+      },
+    );
+  }
+  Widget _buildRoleNavbar() {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return const SizedBox.shrink();
+
+    return FutureBuilder<DocumentSnapshot>(
+      future: FirebaseFirestore.instance.collection('usuarios').doc(user.uid).get(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) return const SizedBox(height: 80);
+        final data = snapshot.data!.data() as Map<String, dynamic>?;
+        final role = data?['rol'] ?? 'Usuario Normal';
+
+        if (role == 'Administrador') {
+          return const AdminNavbar(activeTab: AdminTab.estadisticas);
+        } else {
+          return const LibrarianNavbar(activeTab: LibrarianTab.estadisticas);
+        }
       },
     );
   }

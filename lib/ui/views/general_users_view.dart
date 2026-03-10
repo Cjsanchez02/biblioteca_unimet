@@ -1,4 +1,5 @@
 import 'package:biblioteca_unimet/ui/views/donation_view.dart';
+import 'package:biblioteca_unimet/ui/views/user_catalog_view.dart';
 import 'package:flutter/material.dart';
 import 'package:biblioteca_unimet/ui/views/login_view.dart';
 
@@ -114,18 +115,10 @@ class _GeneralUsersViewState extends State<GeneralUsersView> {
       children: [
         RichText(
           text: const TextSpan(
-            style: TextStyle(
-              fontSize: 48,
-              fontWeight: FontWeight.bold,
-              color: kDarkGray,
-              height: 1.1,
-            ),
+            style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold, color: kDarkGray, height: 1.1),
             children: [
               TextSpan(text: 'Un Puente entre\nsiglos de '),
-              TextSpan(
-                text: 'saber',
-                style: TextStyle(color: kOrange),
-              ),
+              TextSpan(text: 'saber', style: TextStyle(color: kOrange)),
             ],
           ),
         ),
@@ -138,7 +131,9 @@ class _GeneralUsersViewState extends State<GeneralUsersView> {
         _GeneralUsersActionCard(
           title: 'Explorar Biblioteca',
           icon: Icons.search,
-          onTap: () {},
+          onTap: () {
+             Navigator.push(context, MaterialPageRoute(builder: (context) => const UserCatalogView()));
+          },
           isSmall: true,
           paddingHorizontal: 40,
         ),
@@ -148,34 +143,20 @@ class _GeneralUsersViewState extends State<GeneralUsersView> {
     Widget imageContent = Container(
       height: 400,
       width: double.infinity,
-      decoration: BoxDecoration(
-        color: kLightGray,
-        borderRadius: BorderRadius.circular(20),
-      ),
+      decoration: BoxDecoration(color: kLightGray, borderRadius: BorderRadius.circular(20)),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(20),
-        child: Image.asset(
-          'assets/images/biblioteca_2.jpg',
-          fit: BoxFit.cover,
-          width: double.infinity,
-          height: double.infinity,
-        ),
+        child: Image.asset('assets/images/biblioteca_2.jpg', fit: BoxFit.cover, width: double.infinity, height: double.infinity),
       ),
     );
 
     if (isDesktop) {
       return Row(
         crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Expanded(flex: 5, child: textContent),
-          const SizedBox(width: 60),
-          Expanded(flex: 5, child: imageContent),
-        ],
+        children: [Expanded(flex: 5, child: textContent), const SizedBox(width: 60), Expanded(flex: 5, child: imageContent)],
       );
     } else {
-      return Column(
-        children: [imageContent, const SizedBox(height: 40), textContent],
-      );
+      return Column(children: [imageContent, const SizedBox(height: 40), textContent]);
     }
   }
 
@@ -184,94 +165,59 @@ class _GeneralUsersViewState extends State<GeneralUsersView> {
       _GeneralUsersActionCard(
         icon: Icons.menu_book,
         title: 'Catalogo',
-        onTap: () {},
+        onTap: () {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => const UserCatalogView()));
+        },
       ),
       _GeneralUsersActionCard(
         icon: Icons.volunteer_activism,
         title: 'Donaciones',
-        onTap: () {
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                title: const Text('Redirección a página de pagos'),
-                content: const Text(
-                  'Está a punto de ser redirigido a la plataforma de PayPal para continuar con su donación.',
-                ),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text(
-                      'Cancelar',
-                      style: TextStyle(color: Colors.grey),
-                    ),
-                  ),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(backgroundColor: kOrange),
-                    onPressed: () {
-                      Navigator.pop(context);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const DonationView(),
-                        ),
-                      );
-                    },
-                    child: const Text('Continuar'),
-                  ),
-                ],
-              );
-            },
-          );
-        },
+        onTap: () => _mostrarDialogoDonacion(context),
       ),
     ];
 
     if (isDesktop) {
       return Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: actions
-            .map(
-              (a) => Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15),
-                  child: a,
-                ),
-              ),
-            )
-            .toList(),
+        children: actions.map((a) => Expanded(child: Padding(padding: const EdgeInsets.symmetric(horizontal: 15), child: a))).toList(),
       );
     } else {
-      return Column(
-        children: actions
-            .map(
-              (a) =>
-                  Padding(padding: const EdgeInsets.only(bottom: 30), child: a),
-            )
-            .toList(),
-      );
+      return Column(children: actions.map((a) => Padding(padding: const EdgeInsets.only(bottom: 30), child: a)).toList());
     }
+  }
+
+  void _mostrarDialogoDonacion(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          title: const Text('Redirección a página de pagos'),
+          content: const Text('Está a punto de ser redirigido a la plataforma de PayPal para continuar con su donación.'),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar', style: TextStyle(color: Colors.grey))),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: kOrange),
+              onPressed: () {
+                Navigator.pop(context);
+                Navigator.push(context, MaterialPageRoute(builder: (context) => const DonationView()));
+              },
+              child: const Text('Continuar'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Widget _buildFooterSection(bool isDesktop) {
     Widget imageContent = Container(
       height: 350,
       width: double.infinity,
-      decoration: BoxDecoration(
-        color: kLightGray,
-        borderRadius: BorderRadius.circular(20),
-      ),
+      decoration: BoxDecoration(color: kLightGray, borderRadius: BorderRadius.circular(20)),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(20),
-        child: Image.asset(
-          'assets/images/pasillobiblioteca.jpg',
-          fit: BoxFit.cover,
-          width: double.infinity,
-          height: double.infinity,
-        ),
+        child: Image.asset('assets/images/pasillobiblioteca.jpg', fit: BoxFit.cover, width: double.infinity, height: double.infinity),
       ),
     );
 
@@ -283,48 +229,21 @@ class _GeneralUsersViewState extends State<GeneralUsersView> {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 20,
-                offset: const Offset(0, 10),
-              ),
-            ],
+            boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 20, offset: const Offset(0, 10))],
           ),
-          child: Column(
+          child: const Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                '¿Necesitas ayuda?',
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: kDarkGray,
-                ),
-              ),
-              const SizedBox(height: 10),
-              const Text(
-                'Habla con nuestro bibliotecario.',
-                style: TextStyle(fontSize: 16, color: Colors.black54),
-              ),
+              Text('¿Necesitas ayuda?', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: kDarkGray)),
+              SizedBox(height: 10),
+              Text('Habla con nuestro bibliotecario.', style: TextStyle(fontSize: 16, color: Colors.black54)),
             ],
           ),
         ),
         Positioned(
           top: -20,
           right: -20,
-          child: CircleAvatar(
-            radius: 30,
-            backgroundColor: kDarkGray,
-            child: const Text(
-              '?',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
+          child: CircleAvatar(radius: 30, backgroundColor: kDarkGray, child: const Text('?', style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold))),
         ),
       ],
     );
@@ -332,16 +251,10 @@ class _GeneralUsersViewState extends State<GeneralUsersView> {
     if (isDesktop) {
       return Row(
         crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Expanded(flex: 5, child: imageContent),
-          const SizedBox(width: 60),
-          Expanded(flex: 5, child: formContent),
-        ],
+        children: [Expanded(flex: 5, child: imageContent), const SizedBox(width: 60), Expanded(flex: 5, child: formContent)],
       );
     } else {
-      return Column(
-        children: [formContent, const SizedBox(height: 40), imageContent],
-      );
+      return Column(children: [formContent, const SizedBox(height: 40), imageContent]);
     }
   }
 }
@@ -353,17 +266,10 @@ class _GeneralUsersActionCard extends StatefulWidget {
   final bool isSmall;
   final double paddingHorizontal;
 
-  const _GeneralUsersActionCard({
-    required this.icon,
-    required this.title,
-    required this.onTap,
-    this.isSmall = false,
-    this.paddingHorizontal = 0,
-  });
+  const _GeneralUsersActionCard({required this.icon, required this.title, required this.onTap, this.isSmall = false, this.paddingHorizontal = 0});
 
   @override
-  State<_GeneralUsersActionCard> createState() =>
-      _GeneralUsersActionCardState();
+  State<_GeneralUsersActionCard> createState() => _GeneralUsersActionCardState();
 }
 
 class _GeneralUsersActionCardState extends State<_GeneralUsersActionCard> {
@@ -385,47 +291,19 @@ class _GeneralUsersActionCardState extends State<_GeneralUsersActionCard> {
             mainAxisSize: MainAxisSize.min,
             children: [
               if (!widget.isSmall) ...[
-                Icon(
-                  widget.icon,
-                  size: 50,
-                  color: _isHovered
-                      ? _GeneralUsersViewState.kOrange
-                      : Colors.black,
-                ),
+                Icon(widget.icon, size: 50, color: _isHovered ? _GeneralUsersViewState.kOrange : Colors.black),
                 const SizedBox(height: 15),
               ],
               Container(
                 width: widget.paddingHorizontal > 0 ? null : double.infinity,
-                padding: EdgeInsets.symmetric(
-                  vertical: 16,
-                  horizontal: widget.paddingHorizontal,
-                ),
+                padding: EdgeInsets.symmetric(vertical: 16, horizontal: widget.paddingHorizontal),
                 decoration: BoxDecoration(
-                  color: _isHovered
-                      ? _GeneralUsersViewState.kDarkGray
-                      : _GeneralUsersViewState.kOrange,
+                  color: _isHovered ? _GeneralUsersViewState.kDarkGray : _GeneralUsersViewState.kOrange,
                   borderRadius: BorderRadius.circular(8),
-                  boxShadow: _isHovered
-                      ? [
-                          BoxShadow(
-                            color: _GeneralUsersViewState.kOrange.withOpacity(
-                              0.3,
-                            ),
-                            blurRadius: 15,
-                            offset: const Offset(0, 8),
-                          ),
-                        ]
-                      : [],
+                  boxShadow: _isHovered ? [BoxShadow(color: _GeneralUsersViewState.kOrange.withOpacity(0.3), blurRadius: 15, offset: const Offset(0, 8))] : [],
                 ),
                 child: Center(
-                  child: Text(
-                    widget.title,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
+                  child: Text(widget.title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
                 ),
               ),
             ],
