@@ -56,6 +56,7 @@ class _AdminMaterialFormState extends State<AdminMaterialForm> {
   String? _validarStock(String? value) {
     if (value == null || value.isEmpty) return 'Campo obligatorio';
     if (int.tryParse(value) == null) return 'Debe ser un número entero';
+    if (int.parse(value) < 0) return 'No puede ser negativo';
     return null;
   }
 

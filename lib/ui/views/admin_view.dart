@@ -73,7 +73,6 @@ class AdminView extends StatelessWidget {
           if (isDesktop)
             Row(
               children: [
-                _navItem('Inicio', () {}),
                 _navItem('Editar Perfil', () {
                   Navigator.push(
                     context,

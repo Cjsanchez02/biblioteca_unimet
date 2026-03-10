@@ -134,9 +134,6 @@ class _HomeViewState extends State<HomeView> {
           if (isDesktop)
             Row(
               children: [
-                _navItem('Inicio', () {}),
-                _navItem('Servicios', () {}),
-                _navItem('Contactanos', () {}),
                 _navItem('Editar Perfil', () {
                   Navigator.push(
                     context,
