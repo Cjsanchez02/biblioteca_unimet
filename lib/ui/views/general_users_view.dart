@@ -236,7 +236,7 @@ class _GeneralUsersViewState extends State<GeneralUsersView> {
             children: [
               Text('¿Necesitas ayuda?', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: kDarkGray)),
               SizedBox(height: 10),
-              Text('Habla con nuestro bibliotecario.', style: TextStyle(fontSize: 16, color: Colors.black54)),
+              Text('¿Buscas un libro específico? Inicia sesión para solicitarlo a nuestro bibliotecario.', style: TextStyle(fontSize: 16, color: Colors.black54)),
             ],
           ),
         ),

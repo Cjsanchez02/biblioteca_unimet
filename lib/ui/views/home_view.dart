@@ -349,7 +349,41 @@ class _HomeViewState extends State<HomeView> {
             children: [
               const Text('¿Necesitas ayuda?', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: kDarkGray)),
               const SizedBox(height: 10),
-              const Text('Habla con nuestro bibliotecario.', style: TextStyle(fontSize: 16, color: Colors.black54)),
+              const Text('¿No conseguiste el libro que buscabas? Pídelo aquí.', style: TextStyle(fontSize: 16, color: Colors.black54)),
+              const SizedBox(height: 20),
+              TextField(
+                controller: _sugerenciaController,
+                decoration: InputDecoration(
+                  hintText: 'Escribe el título o autor...',
+                  filled: true,
+                  fillColor: kLightGray,
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
+                ),
+              ),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: kOrange,
+                    padding: const EdgeInsets.symmetric(vertical: 15),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                  onPressed: () async {
+                    final texto = _sugerenciaController.text;
+                    bool enviado = await _viewModel.enviarSugerencia(texto, context);
+                    if (enviado) {
+                      _sugerenciaController.clear();
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Sugerencia enviada correctamente'), backgroundColor: Colors.green),
+                        );
+                      }
+                    }
+                  },
+                  child: const Text('Solicitar libro', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                ),
+              ),
             ],
           ),
         ),

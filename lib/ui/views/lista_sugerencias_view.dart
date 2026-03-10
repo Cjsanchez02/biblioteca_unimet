@@ -11,41 +11,39 @@ class ListaSugerenciasView extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Buzón de Sugerencias', style: TextStyle(color: Colors.white)),
-        backgroundColor: const Color(0xFFF7941D), // Tu color naranja
+        title: const Text(
+          'Buzón de Sugerencias',
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: const Color(0xFFF7941D),
       ),
-      // El StreamBuilder es el que se queda escuchando a Firebase en vivo
+
       body: StreamBuilder<QuerySnapshot>(
         stream: servicio.obtenerSugerencias(),
         builder: (context, snapshot) {
-          // 1. Si está cargando...
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          // 2. Si hubo un error...
           if (snapshot.hasError) {
             return const Center(child: Text('Error al cargar las sugerencias'));
           }
 
-          // 3. Si no hay sugerencias...
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
             return const Center(child: Text('No hay sugerencias por ahora.'));
           }
 
-          // 4. Si todo salió bien, dibujamos la lista
           final sugerencias = snapshot.data!.docs;
 
           return ListView.builder(
             padding: const EdgeInsets.all(16),
             itemCount: sugerencias.length,
             itemBuilder: (context, index) {
-              // Extraemos los datos del documento de Firebase
               var datos = sugerencias[index].data() as Map<String, dynamic>;
-              
-              // Convertimos la fecha de Firebase a una fecha legible
+
               DateTime fecha = (datos['fecha'] as Timestamp).toDate();
-              String fechaFormateada = "${fecha.day}/${fecha.month}/${fecha.year}";
+              String fechaFormateada =
+                  "${fecha.day}/${fecha.month}/${fecha.year}";
 
               return Card(
                 elevation: 2,
@@ -60,16 +58,31 @@ class ListaSugerenciasView extends StatelessWidget {
                         children: [
                           Text(
                             datos['nombre'] ?? 'Anónimo',
-                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
                           ),
-                          Text(fechaFormateada, style: const TextStyle(color: Colors.grey)),
+                          Text(
+                            fechaFormateada,
+                            style: const TextStyle(color: Colors.grey),
+                          ),
                         ],
                       ),
                       const SizedBox(height: 4),
-                      Text("Carnet: ${datos['carnet'] ?? 'N/A'}", style: const TextStyle(color: Colors.grey, fontSize: 12)),
+                      Text(
+                        "Carnet: ${datos['carnet'] ?? 'N/A'}",
+                        style: const TextStyle(
+                          color: Colors.grey,
+                          fontSize: 12,
+                        ),
+                      ),
                       const Divider(),
                       const SizedBox(height: 8),
-                      Text(datos['texto'] ?? '', style: const TextStyle(fontSize: 15)),
+                      Text(
+                        datos['texto'] ?? '',
+                        style: const TextStyle(fontSize: 15),
+                      ),
                     ],
                   ),
                 ),

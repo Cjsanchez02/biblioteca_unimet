@@ -79,9 +79,7 @@ class _LibrarianCatalogViewState extends State<LibrarianCatalogView> {
                 child: SizedBox(
                   height: 45,
                   child: TextField(
-                    onChanged: (val) => _viewModel.setTextoTemporal(
-                      val,
-                    ), // Guarda el texto sin filtrar aún
+                    onChanged: (val) => _viewModel.setTextoTemporal(val),
                     decoration: InputDecoration(
                       hintText: "Consultar campo...",
                       border: OutlineInputBorder(
@@ -102,8 +100,7 @@ class _LibrarianCatalogViewState extends State<LibrarianCatalogView> {
                   borderRadius: BorderRadius.circular(5),
                 ),
                 child: TextButton.icon(
-                  onPressed: () =>
-                      _viewModel.aplicarFiltro(), // Ejecuta la búsqueda
+                  onPressed: () => _viewModel.aplicarFiltro(),
                   icon: const Icon(Icons.search, color: Colors.black, size: 20),
                   label: Text(
                     "BUSCAR",
@@ -146,21 +143,21 @@ class _LibrarianCatalogViewState extends State<LibrarianCatalogView> {
     int stockActual = material['stock'] ?? 0;
     String tipo = material['tipo'] ?? 'Libro'; // Obtenemos el tipo
     IconData iconoTipo;
-  switch (tipo) {
-    case 'Guía':
-      iconoTipo = Icons.assignment;
-      break;
-    case 'Revista':
-      iconoTipo = Icons.auto_stories;
-      break;
-    case 'Tesis':
-      iconoTipo = Icons.school;
-      break;
-    case 'Libro':
-    default:
-      iconoTipo = Icons.book;
-      break;
-  }
+    switch (tipo) {
+      case 'Guía':
+        iconoTipo = Icons.assignment;
+        break;
+      case 'Revista':
+        iconoTipo = Icons.auto_stories;
+        break;
+      case 'Tesis':
+        iconoTipo = Icons.school;
+        break;
+      case 'Libro':
+      default:
+        iconoTipo = Icons.book;
+        break;
+    }
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 15),
       child: Row(

@@ -63,6 +63,15 @@ class _DonationViewState extends State<DonationView> {
   }
 
   void _processPayment() async {
+    if (_monto <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Por favor, ingresa un monto mayor a 0 para donar.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
     setState(() => _isProcessing = true);
 
     try {
@@ -129,17 +138,20 @@ class _DonationViewState extends State<DonationView> {
     }
 
     return FutureBuilder<DocumentSnapshot>(
-      future: FirebaseFirestore.instance.collection('usuarios').doc(user.uid).get(),
+      future: FirebaseFirestore.instance
+          .collection('usuarios')
+          .doc(user.uid)
+          .get(),
       builder: (context, snapshot) {
-        if (!snapshot.hasData) return const SizedBox(height: 80); // Placeholder height
-        
+        if (!snapshot.hasData) return const SizedBox(height: 80);
+
         final data = snapshot.data!.data() as Map<String, dynamic>?;
         final role = data?['rol'] ?? 'Usuario Normal';
 
         if (role == 'Bibliotecario') {
           return const LibrarianNavbar(activeTab: LibrarianTab.inicio);
         } else if (role == 'Administrador') {
-          return const SizedBox.shrink(); // AdminView has its own logic
+          return const SizedBox.shrink();
         } else {
           return const UserNavbar(activeTab: UserTab.donaciones);
         }

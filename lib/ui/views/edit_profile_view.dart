@@ -178,7 +178,9 @@ class _EditProfileViewState extends State<EditProfileView> {
 
         // NUEVA LOGICA: CAMBIAR CONTRASENA
         if (_passwordController.text.trim().isNotEmpty) {
-          if (!UsuarioGeneral.validarPassword(_passwordController.text.trim())) {
+          if (!UsuarioGeneral.validarPassword(
+            _passwordController.text.trim(),
+          )) {
             throw Exception(UsuarioGeneral.mensajeErrorPassword);
           }
           await currentUser.updatePassword(_passwordController.text.trim());
@@ -284,7 +286,7 @@ class _EditProfileViewState extends State<EditProfileView> {
                   _buildTextField(
                     "Correo Institucional",
                     _emailController,
-                    enabled: false, // Bloqueado para que no lo puedan editar
+                    enabled: false,
                   ),
                   const SizedBox(height: 20),
                   _buildTextField(
