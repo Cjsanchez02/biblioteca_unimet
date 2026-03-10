@@ -1,14 +1,8 @@
 import 'package:biblioteca_unimet/ui/views/donation_view.dart';
-import 'package:biblioteca_unimet/ui/views/mymaterial_view.dart';
-import 'package:biblioteca_unimet/ui/views/user_catalog_view.dart';
 import 'package:flutter/material.dart';
 import 'package:biblioteca_unimet/viewmodels/auth_viewmodel.dart';
 import 'package:biblioteca_unimet/ui/views/edit_profile_view.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:biblioteca_unimet/viewmodels/sugerencia_viewmodel.dart';
 
-
-class HomeView extends StatefulWidget {
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
 
@@ -40,7 +34,7 @@ class _HomeViewState extends State<HomeView> {
                   ),
                   child: Column(
                     children: [
-                      _buildHeroSection(context, isDesktop),
+                      _buildHeroSection(isDesktop),
                       const SizedBox(height: 80),
                       _buildActionSection(context, isDesktop),
                       const SizedBox(height: 60),
@@ -55,7 +49,7 @@ class _HomeViewState extends State<HomeView> {
             ),
           );
         },
-      ),     
+      ),
     );
   }
 
@@ -74,7 +68,7 @@ class _HomeViewState extends State<HomeView> {
             style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.bold,
-              color: HomeView.kDarkGray,
+              color: _HomeViewState.kDarkGray,
             ),
           ),
           if (isDesktop)
@@ -102,7 +96,7 @@ class _HomeViewState extends State<HomeView> {
               ],
             )
           else
-            const Icon(Icons.menu, color: HomeView.kDarkGray),
+            const Icon(Icons.menu, color: _HomeViewState.kDarkGray),
         ],
       ),
     );
@@ -118,7 +112,7 @@ class _HomeViewState extends State<HomeView> {
           style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w500,
-            color: HomeView.kDarkGray,
+            color: _HomeViewState.kDarkGray,
           ),
         ),
       ),
@@ -134,14 +128,14 @@ class _HomeViewState extends State<HomeView> {
             style: TextStyle(
               fontSize: 48,
               fontWeight: FontWeight.bold,
-              color: HomeView.kDarkGray,
+              color: _HomeViewState.kDarkGray,
               height: 1.1,
             ),
             children: [
               TextSpan(text: 'Un Puente entre\nsiglos de '),
               TextSpan(
                 text: 'saber',
-                style: TextStyle(color: HomeView.kOrange),
+                style: TextStyle(color: _HomeViewState.kOrange),
               ),
             ],
           ),
@@ -166,7 +160,7 @@ class _HomeViewState extends State<HomeView> {
       height: 400,
       width: double.infinity,
       decoration: BoxDecoration(
-        color: HomeView.kLightGray,
+        color: _HomeViewState.kLightGray,
         borderRadius: BorderRadius.circular(20),
       ),
       child: ClipRRect(
@@ -279,7 +273,7 @@ class _HomeViewState extends State<HomeView> {
       height: 350,
       width: double.infinity,
       decoration: BoxDecoration(
-        color: HomeView.kLightGray,
+        color: _HomeViewState.kLightGray,
         borderRadius: BorderRadius.circular(20),
       ),
       child: ClipRRect(
@@ -303,7 +297,7 @@ class _HomeViewState extends State<HomeView> {
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: Colors.black.withValues(alpha: 0.05),
                 blurRadius: 20,
                 offset: const Offset(0, 10),
               ),
@@ -317,7 +311,7 @@ class _HomeViewState extends State<HomeView> {
                 style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
-                  color: HomeView.kDarkGray,
+                  color: _HomeViewState.kDarkGray,
                 ),
               ),
               const SizedBox(height: 10),
@@ -333,7 +327,7 @@ class _HomeViewState extends State<HomeView> {
           right: -20,
           child: CircleAvatar(
             radius: 30,
-            backgroundColor: HomeView.kDarkGray,
+            backgroundColor: _HomeViewState.kDarkGray,
             child: const Text(
               '?',
               style: TextStyle(
@@ -368,7 +362,7 @@ class _HomeViewState extends State<HomeView> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       title: const Row(
         children: [
-          Icon(Icons.warning_amber_outlined, color: HomeView.kOrange),
+          Icon(Icons.warning_amber_outlined, color: _HomeViewState.kOrange),
           SizedBox(width: 10),
           Text('Cerrar Sesión'),
         ],
@@ -380,7 +374,9 @@ class _HomeViewState extends State<HomeView> {
           child: const Text('Cancelar', style: TextStyle(color: Colors.black)),
         ),
         ElevatedButton(
-          style: ElevatedButton.styleFrom(backgroundColor: HomeView.kOrange),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: _HomeViewState.kOrange,
+          ),
           onPressed: () async {
             Navigator.pop(context);
             final vm = AuthViewModel();
@@ -455,7 +451,9 @@ class _HomeActionCardState extends State<_HomeActionCard> {
                   boxShadow: _isHovered
                       ? [
                           BoxShadow(
-                            color: _HomeViewState.kOrange.withOpacity(0.3),
+                            color: _HomeViewState.kOrange.withValues(
+                              alpha: 0.3,
+                            ),
                             blurRadius: 15,
                             offset: const Offset(0, 8),
                           ),

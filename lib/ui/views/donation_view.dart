@@ -87,15 +87,7 @@ class _DonationViewState extends State<DonationView> {
           color: Color(0xFF0070BA),
           size: 60,
         ),
-        icon: const Icon(
-          Icons.check_circle,
-          color: Color(0xFF0070BA),
-          size: 60,
-        ),
         title: const Text('Confirmación de Envío'),
-        content: Text(
-          'Has donado exitosamente $_monto $_monedaSeleccionada a la Biblioteca Unimet.',
-        ),
         content: Text(
           'Has donado exitosamente $_monto $_monedaSeleccionada a la Biblioteca Unimet.',
         ),
@@ -130,7 +122,6 @@ class _DonationViewState extends State<DonationView> {
         children: [
           Expanded(
             child: _isProcessing ? _buildProcessingState() : _buildPayPalFlow(),
-            child: _isProcessing ? _buildProcessingState() : _buildPayPalFlow(),
           ),
           _buildWarningBanner(),
         ],
@@ -146,11 +137,6 @@ class _DonationViewState extends State<DonationView> {
           const CircleAvatar(
             radius: 30,
             backgroundColor: Color(0xFFEDF2F7),
-            child: Icon(
-              Icons.account_balance,
-              color: Color(0xFF003087),
-              size: 30,
-            ),
             child: Icon(
               Icons.account_balance,
               color: Color(0xFF003087),
@@ -225,16 +211,7 @@ class _DonationViewState extends State<DonationView> {
                         color: Colors.black,
                         fontWeight: FontWeight.bold,
                       ),
-                      style: const TextStyle(
-                        fontSize: 20,
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
-                      ),
                       items: _monedas.map((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
                         return DropdownMenuItem<String>(
                           value: value,
                           child: Text(value),
@@ -261,18 +238,10 @@ class _DonationViewState extends State<DonationView> {
               'Pagar con',
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
-            child: Text(
-              'Pagar con',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-            ),
           ),
           const SizedBox(height: 10),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(10),
-            ),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(10),
@@ -325,10 +294,6 @@ class _DonationViewState extends State<DonationView> {
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
                 ),
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
               ),
             ),
           ),
@@ -376,11 +341,6 @@ class _DonationViewState extends State<DonationView> {
       child: const Text(
         'ESTA ES UNA SIMULACIÓN. Ningún cargo será realizado.',
         textAlign: TextAlign.center,
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: 11,
-          fontWeight: FontWeight.bold,
-        ),
         style: TextStyle(
           color: Colors.white,
           fontSize: 11,

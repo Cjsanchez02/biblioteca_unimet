@@ -1,10 +1,7 @@
-import 'package:biblioteca_unimet/ui/views/lista_sugerencias_view.dart';
-import 'package:biblioteca_unimet/ui/views/librarian_catalog_view.dart';
+import 'package:biblioteca_unimet/ui/views/donation_view.dart';
 import 'package:flutter/material.dart';
 import 'package:biblioteca_unimet/viewmodels/auth_viewmodel.dart';
 import 'package:biblioteca_unimet/ui/views/edit_profile_view.dart';
-import 'package:biblioteca_unimet/ui/views/librarian_prestamos_view.dart';
-import 'package:biblioteca_unimet/ui/views/estadisticas_view.dart';
 
 class LibrarianView extends StatefulWidget {
   const LibrarianView({super.key});
@@ -299,7 +296,7 @@ class _LibrarianViewState extends State<LibrarianView> {
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: Colors.black.withValues(alpha: 0.05),
                 blurRadius: 20,
                 offset: const Offset(0, 10),
               ),
@@ -446,8 +443,8 @@ class _LibrarianActionCardState extends State<_LibrarianActionCard> {
                     boxShadow: _isHovered
                         ? [
                             BoxShadow(
-                              color: _LibrarianViewState.kOrange.withOpacity(
-                                0.3,
+                              color: _LibrarianViewState.kOrange.withValues(
+                                alpha: 0.3,
                               ),
                               blurRadius: 15,
                               offset: const Offset(0, 8),

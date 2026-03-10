@@ -1,19 +1,15 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'MaterialBibliografico.dart';
-
 class Prestamo {
-  String id; 
+  String id;
   String correoSolicitante;
   String carrera;
   DateTime fechaSolicitud;
-  DateTime fechaDevolucion; 
+  DateTime fechaDevolucion;
   double multa;
-  String materialId; 
-  String tituloMaterial; 
+  String materialId;
+  String tituloMaterial;
   String materia;
-  String estado; // "solicitado", "devuelto", "atrasado", "prestado"; "rechazado"
+  String
+  estado; // "solicitado", "devuelto", "atrasado", "prestado"; "rechazado"
 
   Prestamo({
     required this.id,
@@ -26,20 +22,18 @@ class Prestamo {
     required this.materia,
     required this.tituloMaterial,
     required this.estado,
-    
   });
 
-  
   double calcularMulta() {
     //terminar
-    return multa; 
+    return multa;
   }
 
   // App a Firebase
   Map<String, dynamic> toMap() {
     return {
       'correoSolicitante': correoSolicitante,
-      'fechaSolicitud': fechaSolicitud, 
+      'fechaSolicitud': fechaSolicitud,
       'fechaDevolucion': fechaDevolucion,
       'carrera': carrera,
       'multa': multa,

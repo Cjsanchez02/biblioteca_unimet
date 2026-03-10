@@ -1,5 +1,4 @@
 import 'package:biblioteca_unimet/ui/views/admin_catalog_view.dart';
-import 'package:biblioteca_unimet/ui/views/donation_view.dart';
 import 'package:biblioteca_unimet/ui/views/admin_users_view.dart';
 import 'package:biblioteca_unimet/ui/views/admin_donations_view.dart';
 
@@ -182,59 +181,16 @@ class AdminView extends StatelessWidget {
 
   Widget _buildActionSection(BuildContext context, bool isDesktop) {
     List<Widget> actions = [
-      _actionBlock(Icons.menu_book, 'Catálogo', () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const AdminCatalogView()),
-        );
-      }),
-      _actionBlock(Icons.bookmark_added, 'Gestión y Préstamos', () {}),
-      _actionBlock(Icons.volunteer_activism, 'Donaciones', () {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15),
-              ),
-              title: const Text('Qué acción desea realizar?'),
-              content: const Text(
-                'Está a punto de ser redirigido a la plataforma de PayPal para continuar con su donación.',
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text(
-                    'Cancelar',
-                    style: TextStyle(color: Colors.grey),
-                  ),
-                ),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: kOrange),
-                  onPressed: () {
-                    Navigator.pop(context);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const DonationView(),
-                      ),
-                    );
-                  },
-                  child: const Text('Continuar'),
-                ),
-              ],
-            );
-          },
-        );
-      }),
-      _actionBlock(Icons.manage_accounts, 'Administrar Usuarios', () {}),
-      _actionBlock(Icons.bar_chart, 'Estadísticas', () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const EstadisticasView()),
-        );
-      }),
-      _AdminActionCard(icon: Icons.menu_book, title: 'Catálogo', onTap: () {}),
+      _AdminActionCard(
+        icon: Icons.menu_book,
+        title: 'Catálogo',
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const AdminCatalogView()),
+          );
+        },
+      ),
       _AdminActionCard(
         icon: Icons.bookmark_added,
         title: 'Gestión y Préstamos',
@@ -263,7 +219,12 @@ class AdminView extends StatelessWidget {
       _AdminActionCard(
         icon: Icons.query_stats,
         title: 'Estadísticas Globales',
-        onTap: () {},
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const EstadisticasView()),
+          );
+        },
       ),
     ];
 
@@ -319,7 +280,7 @@ class AdminView extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -442,7 +403,7 @@ class _AdminActionCardState extends State<_AdminActionCard> {
                     boxShadow: _isHovered
                         ? [
                             BoxShadow(
-                              color: AdminView.kOrange.withOpacity(0.3),
+                              color: AdminView.kOrange.withValues(alpha: 0.3),
                               blurRadius: 15,
                               offset: const Offset(0, 8),
                             ),

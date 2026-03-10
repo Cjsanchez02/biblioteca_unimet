@@ -1,6 +1,5 @@
 import 'package:biblioteca_unimet/services/servicio_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 class AuthViewModel extends ChangeNotifier {
   final ServicioAuth _authService = ServicioAuth();
