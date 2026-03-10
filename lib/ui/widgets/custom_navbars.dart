@@ -13,7 +13,7 @@ import '../views/edit_profile_view.dart';
 import '../views/estadisticas_view.dart';
 import '../../viewmodels/auth_viewmodel.dart';
 
-enum HomeTab { inicio, servicios, contacto, login }
+enum HomeTab { inicio, login }
 
 enum UserTab { inicio, catalogo, prestamos, donaciones, perfil, salir }
 
@@ -36,18 +36,6 @@ class HomeNavbar extends StatelessWidget {
             MaterialPageRoute(builder: (context) => const GeneralUsersView()),
             (route) => false,
           ),
-        ),
-        _NavbarItemConfig(
-          icon: Icons.handyman,
-          label: 'Servicios',
-          isActive: activeTab == HomeTab.servicios,
-          onTap: () {},
-        ),
-        _NavbarItemConfig(
-          icon: Icons.contact_support,
-          label: 'Contáctanos',
-          isActive: activeTab == HomeTab.contacto,
-          onTap: () {},
         ),
         _NavbarItemConfig(
           icon: Icons.login,

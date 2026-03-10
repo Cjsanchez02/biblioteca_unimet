@@ -134,7 +134,7 @@ class _DonationViewState extends State<DonationView> {
   Widget _buildRoleNavbar() {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) {
-      return const HomeNavbar(activeTab: HomeTab.servicios);
+      return const HomeNavbar(activeTab: HomeTab.inicio);
     }
 
     return FutureBuilder<DocumentSnapshot>(
@@ -178,10 +178,6 @@ class _DonationViewState extends State<DonationView> {
             'Donar a Biblioteca Unimet',
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
-          const Text(
-            'Donar a Biblioteca Unimet',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
           const SizedBox(height: 30),
 
           // SECCIÓN DE MONTO Y MONEDA
@@ -194,10 +190,6 @@ class _DonationViewState extends State<DonationView> {
             ),
             child: Column(
               children: [
-                const Text(
-                  'Monto de la donación',
-                  style: TextStyle(color: Colors.grey),
-                ),
                 const Text(
                   'Monto de la donación',
                   style: TextStyle(color: Colors.grey),
@@ -291,14 +283,6 @@ class _DonationViewState extends State<DonationView> {
                       'Tarjeta de crédito principal',
                       style: TextStyle(fontSize: 12, color: Colors.grey),
                     ),
-                    Text(
-                      'Visa •••• 4242',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    Text(
-                      'Tarjeta de crédito principal',
-                      style: TextStyle(fontSize: 12, color: Colors.grey),
-                    ),
                   ],
                 ),
                 Spacer(),
@@ -332,10 +316,6 @@ class _DonationViewState extends State<DonationView> {
             'Transacción protegida por PayPal',
             style: TextStyle(fontSize: 12, color: Colors.grey),
           ),
-          const Text(
-            'Transacción protegida por PayPal',
-            style: TextStyle(fontSize: 12, color: Colors.grey),
-          ),
         ],
       ),
     );
@@ -349,10 +329,6 @@ class _DonationViewState extends State<DonationView> {
         children: [
           CircularProgressIndicator(color: Color(0xFF0070BA)),
           SizedBox(height: 20),
-          Text(
-            'Conectando con PayPal...',
-            style: TextStyle(fontWeight: FontWeight.w500),
-          ),
           Text(
             'Conectando con PayPal...',
             style: TextStyle(fontWeight: FontWeight.w500),

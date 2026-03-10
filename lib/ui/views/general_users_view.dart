@@ -75,8 +75,6 @@ class _GeneralUsersViewState extends State<GeneralUsersView> {
             Row(
               children: [
                 _navItem('Inicio', () {}),
-                _navItem('Servicios', () {}),
-                _navItem('Contactanos', () {}),
                 _navItem('Iniciar Sesión', () {
                   Navigator.push(
                     context,
