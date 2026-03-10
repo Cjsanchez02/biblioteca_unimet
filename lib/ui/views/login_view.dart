@@ -27,8 +27,8 @@ class _LoginViewState extends State<LoginView> {
       return;
     }
 
-    if (!UsuarioGeneral.validarPassword(password)) {
-      _notificar(UsuarioGeneral.mensajeErrorPassword, Colors.red);
+    if (!UsuarioGeneral.validarLogin(password)) {
+      _notificar(UsuarioGeneral.mensajeErrorLogin, Colors.red);
       return;
     }
 

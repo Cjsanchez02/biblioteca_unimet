@@ -178,10 +178,10 @@ class _EditProfileViewState extends State<EditProfileView> {
 
         // NUEVA LOGICA: CAMBIAR CONTRASENA
         if (_passwordController.text.trim().isNotEmpty) {
-          if (!UsuarioGeneral.validarPassword(
+          if (!UsuarioGeneral.validarRegistro(
             _passwordController.text.trim(),
           )) {
-            throw Exception(UsuarioGeneral.mensajeErrorPassword);
+            throw Exception(UsuarioGeneral.mensajeErrorRegistro);
           }
           await currentUser.updatePassword(_passwordController.text.trim());
           _passwordController.clear();

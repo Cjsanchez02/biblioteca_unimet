@@ -373,10 +373,10 @@ class _AdminUsersViewState extends State<AdminUsersView> {
                       return;
                     }
 
-                    if (!UsuarioGeneral.validarPassword(password)) {
+                    if (!UsuarioGeneral.validarRegistro(password)) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text(UsuarioGeneral.mensajeErrorPassword),
+                          content: Text(UsuarioGeneral.mensajeErrorRegistro),
                           backgroundColor: Colors.red,
                         ),
                       );

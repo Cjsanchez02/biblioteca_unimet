@@ -44,8 +44,8 @@ class _RegisterViewState extends State<RegisterView> {
       return;
     }
 
-    if (!UsuarioGeneral.validarPassword(password)) {
-      _mostrarMensaje(UsuarioGeneral.mensajeErrorPassword, Colors.red);
+    if (!UsuarioGeneral.validarRegistro(password)) {
+      _mostrarMensaje(UsuarioGeneral.mensajeErrorRegistro, Colors.red);
       return;
     }
 

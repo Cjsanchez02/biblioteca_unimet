@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../services/servicio_donaciones.dart';
 import '../widgets/custom_navbars.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -17,6 +18,7 @@ class _DonationViewState extends State<DonationView> {
 
   // Variables para el monto y moneda
   final TextEditingController _montoController = TextEditingController();
+  final TextEditingController _cardNumberController = TextEditingController(text: '4242424242424242');
   double _monto = 0.0;
   String _monedaSeleccionada = 'USD';
   final List<String> _monedas = ['USD', 'EUR', 'VES'];
@@ -59,6 +61,7 @@ class _DonationViewState extends State<DonationView> {
   @override
   void dispose() {
     _montoController.dispose();
+    _cardNumberController.dispose();
     super.dispose();
   }
 
@@ -268,16 +271,30 @@ class _DonationViewState extends State<DonationView> {
               color: Colors.white,
               borderRadius: BorderRadius.circular(10),
             ),
-            child: const Row(
+            child: Row(
               children: [
-                Icon(Icons.credit_card, color: Colors.blue),
-                SizedBox(width: 15),
+                const Icon(Icons.credit_card, color: Colors.blue),
+                const SizedBox(width: 15),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Visa •••• 4242',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                    SizedBox(
+                      width: 150,
+                      child: TextField(
+                        controller: _cardNumberController,
+                        keyboardType: TextInputType.number,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                          LengthLimitingTextInputFormatter(16),
+                        ],
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                        decoration: const InputDecoration(
+                          hintText: 'Número de tarjeta',
+                          isDense: true,
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                      ),
                     ),
                     Text(
                       'Tarjeta de crédito principal',

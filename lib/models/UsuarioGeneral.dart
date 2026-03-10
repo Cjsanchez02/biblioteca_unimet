@@ -4,14 +4,21 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class UsuarioGeneral {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  static bool validarPassword(String password) {
+  static bool validarLogin(String password) {
+    return password.length >= 6;
+  }
+
+  static bool validarRegistro(String password) {
     return password.length >= 6 &&
         password.contains(RegExp(r'[A-Z]')) &&
         password.contains(RegExp(r'[a-z]')) &&
         password.contains(RegExp(r'[-!@#$%^&*(),.?":{}|_<>]'));
   }
 
-  static String mensajeErrorPassword =
+  static String mensajeErrorLogin =
+      "La contraseña debe tener al menos 6 caracteres";
+
+  static String mensajeErrorRegistro =
       "La contraseña debe tener al menos 6 caracteres, una mayúscula, una minúscula y un carácter especial";
 
   Future<User?> iniciarSesion(String email, String password) async {
