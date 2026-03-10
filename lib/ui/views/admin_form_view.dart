@@ -1,5 +1,6 @@
 import 'package:biblioteca_unimet/viewmodels/material_viewmodel.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 enum ModoFormulario { agregar, editar, eliminar }
 
@@ -89,7 +90,13 @@ class _AdminMaterialFormState extends State<AdminMaterialForm> {
               ),
               const SizedBox(height: 10),
               _buildTextField(_tituloCtrl, 'Título', _validarTexto, esEliminar),
-              _buildTextField(_autorCtrl, 'Autor', _validarTexto, esEliminar),
+              _buildTextField(
+                _autorCtrl,
+                'Autor',
+                _validarTexto,
+                esEliminar,
+                formatters: [FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z\s]'))],
+              ),
               _buildTextField(_materiaCtrl, 'Materia', _validarTexto, esEliminar),
               _buildTextField(_stockCtrl, 'Stock', _validarStock, esEliminar, keyboard: TextInputType.number),
             ],
@@ -123,6 +130,7 @@ class _AdminMaterialFormState extends State<AdminMaterialForm> {
     String? Function(String?) validator,
     bool disabled, {
     TextInputType? keyboard,
+    List<TextInputFormatter>? formatters,
   }) {
     return TextFormField(
       controller: ctrl,
@@ -130,6 +138,7 @@ class _AdminMaterialFormState extends State<AdminMaterialForm> {
       validator: validator,
       enabled: !disabled,
       keyboardType: keyboard,
+      inputFormatters: formatters,
     );
   }
 

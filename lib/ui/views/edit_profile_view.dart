@@ -281,7 +281,11 @@ class _EditProfileViewState extends State<EditProfileView> {
                     ),
                   ),
                   const SizedBox(height: 40),
-                  _buildTextField("Nombre Completo", _nameController),
+                  _buildTextField(
+                    "Nombre Completo",
+                    _nameController,
+                    inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z\s]'))],
+                  ),
                   const SizedBox(height: 20),
                   _buildTextField(
                     "Correo Institucional",
