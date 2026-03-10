@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/services.dart';
 import '../../models/UsuarioGeneral.dart';
 import '../widgets/admin_navbar.dart';
 
@@ -242,6 +243,7 @@ class _AdminUsersViewState extends State<AdminUsersView> {
                   children: [
                     TextField(
                       controller: nombreCtrl,
+                      inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z\s]'))],
                       decoration: const InputDecoration(
                         labelText: 'Nombre completo',
                         prefixIcon: Icon(Icons.person),

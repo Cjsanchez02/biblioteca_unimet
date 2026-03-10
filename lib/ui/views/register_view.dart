@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../models/UsuarioGeneral.dart';
 
 class RegisterView extends StatefulWidget {
@@ -120,6 +121,7 @@ class _RegisterViewState extends State<RegisterView> {
                 "Nombre y Apellido",
                 Icons.person_outline,
                 false,
+                formatters: [FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z\s]'))],
               ),
               const SizedBox(height: 20),
               // Campo Correo
@@ -186,11 +188,13 @@ class _RegisterViewState extends State<RegisterView> {
     TextEditingController controller,
     String label,
     IconData icon,
-    bool isPassword,
-  ) {
+    bool isPassword, {
+    List<TextInputFormatter>? formatters,
+  }) {
     return TextField(
       controller: controller,
       obscureText: isPassword,
+      inputFormatters: formatters,
       decoration: InputDecoration(
         labelText: label,
         filled: true,
