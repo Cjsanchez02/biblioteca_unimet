@@ -1,7 +1,13 @@
 import 'package:biblioteca_unimet/ui/views/donation_view.dart';
+import 'package:biblioteca_unimet/ui/views/user_catalog_view.dart';
+import 'package:biblioteca_unimet/ui/views/mymaterial_view.dart';
 import 'package:flutter/material.dart';
 import 'package:biblioteca_unimet/viewmodels/auth_viewmodel.dart';
 import 'package:biblioteca_unimet/ui/views/edit_profile_view.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:biblioteca_unimet/viewmodels/sugerencia_viewmodel.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:biblioteca_unimet/ui/widgets/dialog_calification.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -11,6 +17,64 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
+  // Construye la estructura principal
+  final TextEditingController _sugerenciaController = TextEditingController();
+  final HomeViewModel _viewModel = HomeViewModel();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final usuarioActual = FirebaseAuth.instance.currentUser;
+      if (usuarioActual != null && usuarioActual.email != null) {
+        _verificarCalificacionesPendientes(context, usuarioActual.email!);
+      }
+    });
+  }
+
+  // La función que busca en Firebase y lanza el pop-up
+  Future<void> _verificarCalificacionesPendientes(
+    BuildContext context,
+    String correoUsuario,
+  ) async {
+    final db = FirebaseFirestore.instance;
+
+    // Buscamos los préstamos de este estudiante marcados como 'devuelto'
+    final pendientes = await db
+        .collection('prestamos')
+        .where('correoSolicitante', isEqualTo: correoUsuario)
+        .where('estado', isEqualTo: 'devuelto')
+        .get();
+
+    for (var doc in pendientes.docs) {
+      final data = doc.data();
+
+      // Verificamos si ya existe la bandera 'calificado' y si es true
+      bool yaFueCalificado = data.containsKey('calificado')
+          ? data['calificado']
+          : false;
+
+      // Si no ha sido calificado, mostramos el Dialog
+      if (!yaFueCalificado && context.mounted) {
+        await showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (_) => DialogoCalificacion(
+            materialId: data['materialId'],
+            transaccionId: doc.id,
+            tituloLibro: data['tituloMaterial'],
+          ),
+        );
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _sugerenciaController.dispose();
+    super.dispose();
+  }
+
   static const Color kOrange = Color(0xFFF7941D);
   static const Color kDarkGray = Color(0xFF333333);
   static const Color kLightGray = Color(0xFFF4F4F4);
@@ -192,11 +256,31 @@ class _HomeViewState extends State<HomeView> {
 
   Widget _buildActionSection(BuildContext context, bool isDesktop) {
     List<Widget> actions = [
-      _HomeActionCard(icon: Icons.menu_book, title: 'Catalogo', onTap: () {}),
+      _HomeActionCard(
+        icon: Icons.menu_book,
+        title: 'Catalogo',
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const UserCatalogView()),
+          );
+        },
+      ),
       _HomeActionCard(
         icon: Icons.bookmark_added,
         title: 'Gestion y Prestamos',
-        onTap: () {},
+        onTap: () {
+          final usuario = FirebaseAuth.instance.currentUser;
+          if (usuario != null && usuario.email != null) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) =>
+                    MisPrestamosView(correoUsuario: usuario.email!),
+              ),
+            );
+          }
+        },
       ),
       _HomeActionCard(
         icon: Icons.volunteer_activism,

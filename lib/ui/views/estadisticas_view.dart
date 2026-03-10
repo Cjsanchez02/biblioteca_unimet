@@ -150,7 +150,7 @@ class EstadisticasView extends StatelessWidget {
             width: 30, 
             borderRadius: BorderRadius.circular(4),
             backDrawRodData: BackgroundBarChartRodData(
-              show: true, toY: 5, color: Colors.grey[200] // Fondo hasta 5 estrellas
+              show: true, toY: 5, color: Colors.grey[200] 
             )
           )
         ],
@@ -167,7 +167,6 @@ class EstadisticasView extends StatelessWidget {
               showTitles: true,
               getTitlesWidget: (double value, TitleMeta meta) {
                 if (value.toInt() >= datos.length) return const Text('');
-                // Muestra solo las primeras letras o siglas si el nombre es muy largo
                 String nombre = datos.keys.elementAt(value.toInt());
                 return Padding(
                   padding: const EdgeInsets.only(top: 8.0),

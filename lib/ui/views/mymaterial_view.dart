@@ -102,6 +102,10 @@ class MisPrestamosView extends StatelessWidget {
         colorEstado = Colors.red;
         iconoEstado = Icons.warning;
         break;
+      case 'rechazado':
+        colorEstado = Colors.red;
+        iconoEstado = Icons.warning;
+        break;
       case 'aprobado':
       default:
         colorEstado = Colors.green;

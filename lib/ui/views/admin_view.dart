@@ -1,6 +1,7 @@
 import 'package:biblioteca_unimet/ui/views/admin_catalog_view.dart';
 import 'package:biblioteca_unimet/ui/views/admin_users_view.dart';
 import 'package:biblioteca_unimet/ui/views/admin_donations_view.dart';
+import 'package:biblioteca_unimet/ui/views/librarian_prestamos_view.dart';
 
 import 'package:flutter/material.dart';
 import 'package:biblioteca_unimet/viewmodels/auth_viewmodel.dart';
@@ -194,7 +195,12 @@ class AdminView extends StatelessWidget {
       _AdminActionCard(
         icon: Icons.bookmark_added,
         title: 'Gestión y Préstamos',
-        onTap: () {},
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => LibrarianPrestamosView()),
+          );
+        },
       ),
       _AdminActionCard(
         icon: Icons.volunteer_activism,

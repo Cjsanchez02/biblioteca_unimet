@@ -1,4 +1,7 @@
 import 'package:biblioteca_unimet/ui/views/donation_view.dart';
+import 'package:biblioteca_unimet/ui/views/librarian_catalog_view.dart';
+import 'package:biblioteca_unimet/ui/views/librarian_prestamos_view.dart';
+import 'package:biblioteca_unimet/ui/views/estadisticas_view.dart';
 import 'package:flutter/material.dart';
 import 'package:biblioteca_unimet/viewmodels/auth_viewmodel.dart';
 import 'package:biblioteca_unimet/ui/views/edit_profile_view.dart';
@@ -185,12 +188,24 @@ class _LibrarianViewState extends State<LibrarianView> {
       _LibrarianActionCard(
         icon: Icons.menu_book,
         title: 'Catálogo',
-        onTap: () {},
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const LibrarianCatalogView(),
+            ),
+          );
+        },
       ),
       _LibrarianActionCard(
         icon: Icons.bookmark_added,
         title: 'Gestión y Préstamos',
-        onTap: () {},
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => LibrarianPrestamosView()),
+          );
+        },
       ),
       _LibrarianActionCard(
         icon: Icons.volunteer_activism,
@@ -237,7 +252,12 @@ class _LibrarianViewState extends State<LibrarianView> {
       _LibrarianActionCard(
         icon: Icons.query_stats,
         title: 'Estadísticas',
-        onTap: () {},
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const EstadisticasView()),
+          );
+        },
       ),
     ];
 

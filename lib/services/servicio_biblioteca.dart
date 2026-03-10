@@ -6,31 +6,29 @@ class BibliotecaService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
   // Funcion para solicitar un préstamo
-  Future<bool> solicitarPrestamo(String correoUsuario, MaterialBibliografico libro) async {
+  Future<String> solicitarPrestamo(String correoUsuario, MaterialBibliografico libro) async {
     try {
       // Verificación de préstamo activo para el mismo material
       final prestamosActivos = await _db.collection('prestamos')
           .where('correoSolicitante', isEqualTo: correoUsuario) // Filtramos por su correo
           .where('materialId', isEqualTo: libro.id)             // Filtramos por el ID del libro
-          .where('estado', isEqualTo: 'prestado')
+          .where('estado', whereIn: ['aprobado', 'solicitado'])
           .get(); 
 
       // Verificacion
       if (prestamosActivos.docs.isNotEmpty) {
-        print("Error: Ya tienes una copia de '${libro.titulo}' en préstamo.");
-        return false; 
+        return "Error: Ya tienes una copia de '${libro.titulo}' en préstamo o solicitado.";
       }
       // Verificación de stock
       if (!libro.hayStock()) {
-        print("Error: No hay stock disponible para este material.");
-        return false; 
+        return "Error: No hay stock disponible para este material.";
       }
 
       String carreraFinal = 'No especificada';
 
       final usuarioQuery = await _db.collection('usuarios')
           .where('email', isEqualTo: correoUsuario)
-          .limit(1) // Solo necesitamos un resultado
+          .limit(1) 
           .get();
 
       if (usuarioQuery.docs.isNotEmpty) {
@@ -74,12 +72,10 @@ class BibliotecaService {
       // Ejecucion en paralelo
       await batch.commit();
       
-      print("¡Préstamo exitoso!");
-      return true;
+      return "¡Préstamo solicitado con éxito! Espera la aprobación del bibliotecario.";
 
     } catch (e) {
-      print("Error al procesar el préstamo: $e");
-      return false;
+      return "Error en el servidor: ${e.toString()}";
     }
   }
   
