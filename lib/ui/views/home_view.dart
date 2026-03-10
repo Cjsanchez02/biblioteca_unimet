@@ -1,6 +1,6 @@
 import 'package:biblioteca_unimet/ui/views/donation_view.dart';
-import 'package:biblioteca_unimet/ui/views/mymaterial_view.dart';
 import 'package:biblioteca_unimet/ui/views/user_catalog_view.dart';
+import 'package:biblioteca_unimet/ui/views/mymaterial_view.dart';
 import 'package:flutter/material.dart';
 import 'package:biblioteca_unimet/viewmodels/auth_viewmodel.dart';
 import 'package:biblioteca_unimet/ui/views/edit_profile_view.dart';
@@ -9,13 +9,8 @@ import 'package:biblioteca_unimet/viewmodels/sugerencia_viewmodel.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:biblioteca_unimet/ui/widgets/dialog_calification.dart';
 
-
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
-
-  static const Color kOrange = Color(0xFFF7941D);
-  static const Color kDarkGray = Color(0xFF333333);
-  static const Color kLightGray = Color(0xFFF4F4F4);
 
   @override
   State<HomeView> createState() => _HomeViewState();
@@ -38,20 +33,26 @@ class _HomeViewState extends State<HomeView> {
   }
 
   // La función que busca en Firebase y lanza el pop-up
-  Future<void> _verificarCalificacionesPendientes(BuildContext context, String correoUsuario) async {
+  Future<void> _verificarCalificacionesPendientes(
+    BuildContext context,
+    String correoUsuario,
+  ) async {
     final db = FirebaseFirestore.instance;
-    
+
     // Buscamos los préstamos de este estudiante marcados como 'devuelto'
-    final pendientes = await db.collection('prestamos')
+    final pendientes = await db
+        .collection('prestamos')
         .where('correoSolicitante', isEqualTo: correoUsuario)
         .where('estado', isEqualTo: 'devuelto')
         .get();
 
     for (var doc in pendientes.docs) {
       final data = doc.data();
-      
+
       // Verificamos si ya existe la bandera 'calificado' y si es true
-      bool yaFueCalificado = data.containsKey('calificado') ? data['calificado'] : false;
+      bool yaFueCalificado = data.containsKey('calificado')
+          ? data['calificado']
+          : false;
 
       // Si no ha sido calificado, mostramos el Dialog
       if (!yaFueCalificado && context.mounted) {
@@ -74,6 +75,10 @@ class _HomeViewState extends State<HomeView> {
     super.dispose();
   }
 
+  static const Color kOrange = Color(0xFFF7941D);
+  static const Color kDarkGray = Color(0xFF333333);
+  static const Color kLightGray = Color(0xFFF4F4F4);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -93,7 +98,7 @@ class _HomeViewState extends State<HomeView> {
                   ),
                   child: Column(
                     children: [
-                      _buildHeroSection(context, isDesktop),
+                      _buildHeroSection(isDesktop),
                       const SizedBox(height: 80),
                       _buildActionSection(context, isDesktop),
                       const SizedBox(height: 60),
@@ -108,11 +113,10 @@ class _HomeViewState extends State<HomeView> {
             ),
           );
         },
-      ),     
+      ),
     );
   }
 
-  // Genera la barra de navegacion superior
   Widget _buildNavbar(bool isDesktop, BuildContext context) {
     return Container(
       padding: EdgeInsets.symmetric(
@@ -128,7 +132,7 @@ class _HomeViewState extends State<HomeView> {
             style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.bold,
-              color: HomeView.kDarkGray,
+              color: _HomeViewState.kDarkGray,
             ),
           ),
           if (isDesktop)
@@ -145,7 +149,6 @@ class _HomeViewState extends State<HomeView> {
                     ),
                   );
                 }),
-
                 _navItem('Cerrar Sesión', () {
                   showDialog(
                     context: context,
@@ -157,13 +160,12 @@ class _HomeViewState extends State<HomeView> {
               ],
             )
           else
-            const Icon(Icons.menu, color: HomeView.kDarkGray),
+            const Icon(Icons.menu, color: _HomeViewState.kDarkGray),
         ],
       ),
     );
   }
 
-  // Crea un enlace de texto individual para el menu
   Widget _navItem(String title, VoidCallback onTap) {
     return Padding(
       padding: const EdgeInsets.only(left: 30),
@@ -174,15 +176,14 @@ class _HomeViewState extends State<HomeView> {
           style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w500,
-            color: HomeView.kDarkGray,
+            color: _HomeViewState.kDarkGray,
           ),
         ),
       ),
     );
   }
 
-  // Construye la seccion principal con el mensaje de bienvenida y la primera imagen
-  Widget _buildHeroSection(BuildContext context, bool isDesktop) {
+  Widget _buildHeroSection(bool isDesktop) {
     Widget textContent = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -191,14 +192,14 @@ class _HomeViewState extends State<HomeView> {
             style: TextStyle(
               fontSize: 48,
               fontWeight: FontWeight.bold,
-              color: HomeView.kDarkGray,
+              color: _HomeViewState.kDarkGray,
               height: 1.1,
             ),
             children: [
               TextSpan(text: 'Un Puente entre\nsiglos de '),
               TextSpan(
                 text: 'saber',
-                style: TextStyle(color: HomeView.kOrange),
+                style: TextStyle(color: _HomeViewState.kOrange),
               ),
             ],
           ),
@@ -209,24 +210,12 @@ class _HomeViewState extends State<HomeView> {
           style: TextStyle(fontSize: 18, color: Colors.black54, height: 1.5),
         ),
         const SizedBox(height: 40),
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: HomeView.kOrange,
-            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const UserCatalogView()),
-            );
-          },
-          child: const Text(
-            'Explorar Biblioteca',
-            style: TextStyle(fontSize: 18, color: Colors.white),
-          ),
+        _HomeActionCard(
+          title: 'Explorar Biblioteca',
+          icon: Icons.search,
+          onTap: () {},
+          isSmall: true,
+          paddingHorizontal: 40,
         ),
       ],
     );
@@ -235,7 +224,7 @@ class _HomeViewState extends State<HomeView> {
       height: 400,
       width: double.infinity,
       decoration: BoxDecoration(
-        color: HomeView.kLightGray,
+        color: _HomeViewState.kLightGray,
         borderRadius: BorderRadius.circular(20),
       ),
       child: ClipRRect(
@@ -265,73 +254,76 @@ class _HomeViewState extends State<HomeView> {
     }
   }
 
-  // Renderiza los bloques de accion rapida (Catalogo, Prestamos, Donaciones)
   Widget _buildActionSection(BuildContext context, bool isDesktop) {
     List<Widget> actions = [
-      _actionBlock(Icons.menu_book, 'Catalogo', () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const UserCatalogView()),
-        );
-      }),
-      _actionBlock(Icons.bookmark_added, 'Gestion y Prestamos', () {
-        final usuarioActual = FirebaseAuth.instance.currentUser;
-
-        //Verificacion
-        if (usuarioActual != null && usuarioActual.email != null) {
+      _HomeActionCard(
+        icon: Icons.menu_book,
+        title: 'Catalogo',
+        onTap: () {
           Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (context) =>
-                  MisPrestamosView(correoUsuario: usuarioActual.email!),
-            ),
+            MaterialPageRoute(builder: (context) => const UserCatalogView()),
           );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Error: No se encontró la sesión del usuario.'),
-            ),
-          );
-        }
-      }),
-      _actionBlock(Icons.volunteer_activism, 'Donaciones', () {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15),
+        },
+      ),
+      _HomeActionCard(
+        icon: Icons.bookmark_added,
+        title: 'Gestion y Prestamos',
+        onTap: () {
+          final usuario = FirebaseAuth.instance.currentUser;
+          if (usuario != null && usuario.email != null) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) =>
+                    MisPrestamosView(correoUsuario: usuario.email!),
               ),
-              title: const Text('Redirección a página de pagos'),
-              content: const Text(
-                'Está a punto de ser redirigido a la plataforma de PayPal para continuar con su donación.',
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context), // Cierra el pop-up
-                  child: const Text(
-                    'Cancelar',
-                    style: TextStyle(color: Colors.grey),
-                  ),
-                ),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: HomeView.kOrange),
-                  onPressed: () {
-                    Navigator.pop(context);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const DonationView(),
-                      ),
-                    );
-                  },
-                  child: const Text('Continuar'),
-                ),
-              ],
             );
-          },
-        );
-      }),
+          }
+        },
+      ),
+      _HomeActionCard(
+        icon: Icons.volunteer_activism,
+        title: 'Donaciones',
+        onTap: () {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                title: const Text('Redirección a página de pagos'),
+                content: const Text(
+                  'Está a punto de ser redirigido a la plataforma de PayPal para continuar con su donación.',
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text(
+                      'Cancelar',
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                  ),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(backgroundColor: kOrange),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const DonationView(),
+                        ),
+                      );
+                    },
+                    child: const Text('Continuar'),
+                  ),
+                ],
+              );
+            },
+          );
+        },
+      ),
     ];
 
     if (isDesktop) {
@@ -360,44 +352,12 @@ class _HomeViewState extends State<HomeView> {
     }
   }
 
-  // Crea el diseno individual de cada boton de accion con su icono
-  Widget _actionBlock(IconData icon, String title, VoidCallback onTap) {
-    return Column(
-      children: [
-        Icon(icon, size: 60, color: Colors.black),
-        const SizedBox(height: 20),
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: HomeView.kOrange,
-              padding: const EdgeInsets.symmetric(vertical: 20),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-            onPressed: onTap,
-            child: Text(
-              title,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  // Construye la seccion inferior que contiene la segunda imagen
   Widget _buildFooterSection(bool isDesktop) {
     Widget imageContent = Container(
       height: 350,
       width: double.infinity,
       decoration: BoxDecoration(
-        color: HomeView.kLightGray,
+        color: _HomeViewState.kLightGray,
         borderRadius: BorderRadius.circular(20),
       ),
       child: ClipRRect(
@@ -421,7 +381,7 @@ class _HomeViewState extends State<HomeView> {
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: Colors.black.withValues(alpha: 0.05),
                 blurRadius: 20,
                 offset: const Offset(0, 10),
               ),
@@ -435,73 +395,13 @@ class _HomeViewState extends State<HomeView> {
                 style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
-                  color: HomeView.kDarkGray,
+                  color: _HomeViewState.kDarkGray,
                 ),
               ),
               const SizedBox(height: 10),
               const Text(
                 'Habla con nuestro bibliotecario.',
                 style: TextStyle(fontSize: 16, color: Colors.black54),
-              ),
-              const SizedBox(height: 30),
-              // 1. La caja de texto conectada al controlador y con límite de 500
-              TextField(
-                controller: _sugerenciaController, // Conectamos el controlador
-                maxLines: 4,
-                maxLength: 500, // ¡Flutter pone el contador 0/500 automáticamente!
-                decoration: InputDecoration(
-                  hintText: 'Escribe tu mensaje aqui...',
-                  hintStyle: const TextStyle(color: Colors.black38),
-                  filled: true,
-                  fillColor: HomeView.kLightGray, // Ajusté la constante por si marca error
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-
-              // 2. El botón conectado a tu ViewModel
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: HomeView.kOrange, // Ajusté la constante
-                    padding: const EdgeInsets.symmetric(vertical: 20),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  onPressed: () async {
-                    // Llamamos a tu lógica limpia
-                    bool exito = await _viewModel.enviarSugerencia(
-                      _sugerenciaController.text, 
-                      context
-                    );
-                    
-                    // Si Firebase lo guardó bien, vaciamos la caja y avisamos
-                    if (exito) {
-                      _sugerenciaController.clear();
-                      if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('¡Sugerencia enviada con éxito!'),
-                            backgroundColor: Colors.green,
-                          ),
-                        );
-                      }
-                    }
-                  },
-                  child: const Text(
-                    'Enviar mensaje',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
               ),
             ],
           ),
@@ -511,7 +411,7 @@ class _HomeViewState extends State<HomeView> {
           right: -20,
           child: CircleAvatar(
             radius: 30,
-            backgroundColor: HomeView.kDarkGray,
+            backgroundColor: _HomeViewState.kDarkGray,
             child: const Text(
               '?',
               style: TextStyle(
@@ -546,7 +446,7 @@ class _HomeViewState extends State<HomeView> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       title: const Row(
         children: [
-          Icon(Icons.warning_amber_outlined, color: HomeView.kOrange),
+          Icon(Icons.warning_amber_outlined, color: _HomeViewState.kOrange),
           SizedBox(width: 10),
           Text('Cerrar Sesión'),
         ],
@@ -558,7 +458,9 @@ class _HomeViewState extends State<HomeView> {
           child: const Text('Cancelar', style: TextStyle(color: Colors.black)),
         ),
         ElevatedButton(
-          style: ElevatedButton.styleFrom(backgroundColor: HomeView.kOrange),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: _HomeViewState.kOrange,
+          ),
           onPressed: () async {
             Navigator.pop(context);
             final vm = AuthViewModel();
@@ -574,3 +476,89 @@ class _HomeViewState extends State<HomeView> {
   }
 }
 
+class _HomeActionCard extends StatefulWidget {
+  final IconData icon;
+  final String title;
+  final VoidCallback onTap;
+  final bool isSmall;
+  final double paddingHorizontal;
+
+  const _HomeActionCard({
+    required this.icon,
+    required this.title,
+    required this.onTap,
+    this.isSmall = false,
+    this.paddingHorizontal = 0,
+  });
+
+  @override
+  State<_HomeActionCard> createState() => _HomeActionCardState();
+}
+
+class _HomeActionCardState extends State<_HomeActionCard> {
+  bool _isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: widget.onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 250),
+          transform: Matrix4.identity()..scale(_isHovered ? 1.05 : 1.0),
+          curve: Curves.easeOutBack,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (!widget.isSmall) ...[
+                Icon(
+                  widget.icon,
+                  size: 50,
+                  color: _isHovered ? _HomeViewState.kOrange : Colors.black,
+                ),
+                const SizedBox(height: 15),
+              ],
+              Container(
+                width: widget.paddingHorizontal > 0 ? null : double.infinity,
+                padding: EdgeInsets.symmetric(
+                  vertical: 16,
+                  horizontal: widget.paddingHorizontal,
+                ),
+                decoration: BoxDecoration(
+                  color: _isHovered
+                      ? _HomeViewState.kDarkGray
+                      : _HomeViewState.kOrange,
+                  borderRadius: BorderRadius.circular(8),
+                  boxShadow: _isHovered
+                      ? [
+                          BoxShadow(
+                            color: _HomeViewState.kOrange.withValues(
+                              alpha: 0.3,
+                            ),
+                            blurRadius: 15,
+                            offset: const Offset(0, 8),
+                          ),
+                        ]
+                      : [],
+                ),
+                child: Center(
+                  child: Text(
+                    widget.title,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

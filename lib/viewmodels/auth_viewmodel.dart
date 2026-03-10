@@ -1,6 +1,5 @@
 import 'package:biblioteca_unimet/services/servicio_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 class AuthViewModel extends ChangeNotifier {
   final ServicioAuth _authService = ServicioAuth();
@@ -9,7 +8,7 @@ class AuthViewModel extends ChangeNotifier {
     try {
       await _authService.cerrarSesion();
       if (!context.mounted) return;
-      Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+      Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
     } catch (e) {
       _showErrorDialog(context, e.toString());
       rethrow;

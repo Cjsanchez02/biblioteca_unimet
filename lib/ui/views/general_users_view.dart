@@ -1,16 +1,15 @@
-import 'package:biblioteca_unimet/ui/views/admin_catalog_view.dart';
-import 'package:biblioteca_unimet/ui/views/admin_users_view.dart';
-import 'package:biblioteca_unimet/ui/views/admin_donations_view.dart';
-import 'package:biblioteca_unimet/ui/views/librarian_prestamos_view.dart';
-
+import 'package:biblioteca_unimet/ui/views/donation_view.dart';
 import 'package:flutter/material.dart';
-import 'package:biblioteca_unimet/viewmodels/auth_viewmodel.dart';
-import 'package:biblioteca_unimet/ui/views/edit_profile_view.dart';
-import 'package:biblioteca_unimet/ui/views/estadisticas_view.dart';
+import 'package:biblioteca_unimet/ui/views/login_view.dart';
 
-class AdminView extends StatelessWidget {
-  const AdminView({super.key});
+class GeneralUsersView extends StatefulWidget {
+  const GeneralUsersView({super.key});
 
+  @override
+  State<GeneralUsersView> createState() => _GeneralUsersViewState();
+}
+
+class _GeneralUsersViewState extends State<GeneralUsersView> {
   static const Color kOrange = Color(0xFFF7941D);
   static const Color kDarkGray = Color(0xFF333333);
   static const Color kLightGray = Color(0xFFF4F4F4);
@@ -40,7 +39,7 @@ class AdminView extends StatelessWidget {
                       const SizedBox(height: 60),
                       const Divider(thickness: 1, color: Colors.black12),
                       const SizedBox(height: 60),
-                      _buildFooterSection(isDesktop, context),
+                      _buildFooterSection(isDesktop),
                       const SizedBox(height: 60),
                     ],
                   ),
@@ -64,7 +63,7 @@ class AdminView extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           const Text(
-            'MetroShare - Administrador',
+            'Biblioteca Unimet',
             style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.bold,
@@ -75,20 +74,12 @@ class AdminView extends StatelessWidget {
             Row(
               children: [
                 _navItem('Inicio', () {}),
-                _navItem('Editar Perfil', () {
+                _navItem('Servicios', () {}),
+                _navItem('Contactanos', () {}),
+                _navItem('Iniciar Sesión', () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                      builder: (context) => const EditProfileView(),
-                    ),
-                  );
-                }),
-                _navItem('Cerrar Sesión', () {
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return _dialogoCerrarSesion(context);
-                    },
+                    MaterialPageRoute(builder: (context) => const LoginView()),
                   );
                 }),
               ],
@@ -130,9 +121,9 @@ class AdminView extends StatelessWidget {
               height: 1.1,
             ),
             children: [
-              TextSpan(text: 'Panel de\nGestión '),
+              TextSpan(text: 'Un Puente entre\nsiglos de '),
               TextSpan(
-                text: 'Global',
+                text: 'saber',
                 style: TextStyle(color: kOrange),
               ),
             ],
@@ -140,8 +131,16 @@ class AdminView extends StatelessWidget {
         ),
         const SizedBox(height: 20),
         const Text(
-          'Toma el control total del ecosistema digital de la biblioteca. Como administrador principal, supervisas la integridad de los datos, gestionas los permisos de usuarios y bibliotecarios, y evalúas el impacto estratégico de la plataforma mediante estadísticas globales detalladas, garantizando una experiencia educativa de excelencia para toda la UNIMET.',
-          style: TextStyle(fontSize: 20, color: Colors.black54, height: 1.6),
+          'Accede a miles de recursos academicos, gestiona tus prestamos y contribuye con el desarrollo estudiantil a traves de donaciones.',
+          style: TextStyle(fontSize: 18, color: Colors.black54, height: 1.5),
+        ),
+        const SizedBox(height: 40),
+        _GeneralUsersActionCard(
+          title: 'Explorar Biblioteca',
+          icon: Icons.search,
+          onTap: () {},
+          isSmall: true,
+          paddingHorizontal: 40,
         ),
       ],
     );
@@ -182,53 +181,50 @@ class AdminView extends StatelessWidget {
 
   Widget _buildActionSection(BuildContext context, bool isDesktop) {
     List<Widget> actions = [
-      _AdminActionCard(
+      _GeneralUsersActionCard(
         icon: Icons.menu_book,
-        title: 'Catálogo',
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const AdminCatalogView()),
-          );
-        },
+        title: 'Catalogo',
+        onTap: () {},
       ),
-      _AdminActionCard(
-        icon: Icons.bookmark_added,
-        title: 'Gestión y Préstamos',
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => LibrarianPrestamosView()),
-          );
-        },
-      ),
-      _AdminActionCard(
+      _GeneralUsersActionCard(
         icon: Icons.volunteer_activism,
-        title: 'Ver Donaciones',
+        title: 'Donaciones',
         onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const AdminDonationsView()),
-          );
-        },
-      ),
-      _AdminActionCard(
-        icon: Icons.manage_accounts,
-        title: 'Administrar Usuarios',
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const AdminUsersView()),
-          );
-        },
-      ),
-      _AdminActionCard(
-        icon: Icons.query_stats,
-        title: 'Estadísticas Globales',
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const EstadisticasView()),
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                title: const Text('Redirección a página de pagos'),
+                content: const Text(
+                  'Está a punto de ser redirigido a la plataforma de PayPal para continuar con su donación.',
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text(
+                      'Cancelar',
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                  ),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(backgroundColor: kOrange),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const DonationView(),
+                        ),
+                      );
+                    },
+                    child: const Text('Continuar'),
+                  ),
+                ],
+              );
+            },
           );
         },
       ),
@@ -241,7 +237,7 @@ class AdminView extends StatelessWidget {
             .map(
               (a) => Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
                   child: a,
                 ),
               ),
@@ -260,7 +256,7 @@ class AdminView extends StatelessWidget {
     }
   }
 
-  Widget _buildFooterSection(bool isDesktop, BuildContext context) {
+  Widget _buildFooterSection(bool isDesktop) {
     Widget imageContent = Container(
       height: 350,
       width: double.infinity,
@@ -279,37 +275,58 @@ class AdminView extends StatelessWidget {
       ),
     );
 
-    Widget formContent = Container(
-      padding: const EdgeInsets.all(40),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
+    Widget formContent = Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(40),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Panel de Administración',
-            style: TextStyle(
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-              color: kDarkGray,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                '¿Necesitas ayuda?',
+                style: TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  color: kDarkGray,
+                ),
+              ),
+              const SizedBox(height: 10),
+              const Text(
+                'Habla con nuestro bibliotecario.',
+                style: TextStyle(fontSize: 16, color: Colors.black54),
+              ),
+            ],
+          ),
+        ),
+        Positioned(
+          top: -20,
+          right: -20,
+          child: CircleAvatar(
+            radius: 30,
+            backgroundColor: kDarkGray,
+            child: const Text(
+              '?',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
-          const SizedBox(height: 10),
-          const Text(
-            'Gestiona todos los aspectos del sistema bibliotecario.',
-            style: TextStyle(fontSize: 16, color: Colors.black54),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
 
     if (isDesktop) {
@@ -327,56 +344,29 @@ class AdminView extends StatelessWidget {
       );
     }
   }
-
-  Widget _dialogoCerrarSesion(BuildContext context) {
-    return AlertDialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-      title: const Row(
-        children: [
-          Icon(Icons.warning_amber_outlined, color: kOrange),
-          SizedBox(width: 10),
-          Text('Cerrar Sesión'),
-        ],
-      ),
-      content: const Text('¿Estás seguro de que deseas cerrar sesión?'),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('Cancelar', style: TextStyle(color: Colors.black)),
-        ),
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(backgroundColor: kOrange),
-          onPressed: () async {
-            Navigator.pop(context);
-            final vm = AuthViewModel();
-            await vm.cerrarSesion(context);
-          },
-          child: const Text(
-            'Cerrar Sesión',
-            style: TextStyle(color: Colors.black),
-          ),
-        ),
-      ],
-    );
-  }
 }
 
-class _AdminActionCard extends StatefulWidget {
+class _GeneralUsersActionCard extends StatefulWidget {
   final IconData icon;
   final String title;
   final VoidCallback onTap;
+  final bool isSmall;
+  final double paddingHorizontal;
 
-  const _AdminActionCard({
+  const _GeneralUsersActionCard({
     required this.icon,
     required this.title,
     required this.onTap,
+    this.isSmall = false,
+    this.paddingHorizontal = 0,
   });
 
   @override
-  State<_AdminActionCard> createState() => _AdminActionCardState();
+  State<_GeneralUsersActionCard> createState() =>
+      _GeneralUsersActionCardState();
 }
 
-class _AdminActionCardState extends State<_AdminActionCard> {
+class _GeneralUsersActionCardState extends State<_GeneralUsersActionCard> {
   bool _isHovered = false;
 
   @override
@@ -392,38 +382,48 @@ class _AdminActionCardState extends State<_AdminActionCard> {
           transform: Matrix4.identity()..scale(_isHovered ? 1.05 : 1.0),
           curve: Curves.easeOutBack,
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(
-                widget.icon,
-                size: 38,
-                color: _isHovered ? AdminView.kOrange : Colors.black,
-              ),
-              const SizedBox(height: 15),
-              SizedBox(
-                width: double.infinity,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  decoration: BoxDecoration(
-                    color: _isHovered ? AdminView.kDarkGray : AdminView.kOrange,
-                    borderRadius: BorderRadius.circular(8),
-                    boxShadow: _isHovered
-                        ? [
-                            BoxShadow(
-                              color: AdminView.kOrange.withValues(alpha: 0.3),
-                              blurRadius: 15,
-                              offset: const Offset(0, 8),
+              if (!widget.isSmall) ...[
+                Icon(
+                  widget.icon,
+                  size: 50,
+                  color: _isHovered
+                      ? _GeneralUsersViewState.kOrange
+                      : Colors.black,
+                ),
+                const SizedBox(height: 15),
+              ],
+              Container(
+                width: widget.paddingHorizontal > 0 ? null : double.infinity,
+                padding: EdgeInsets.symmetric(
+                  vertical: 16,
+                  horizontal: widget.paddingHorizontal,
+                ),
+                decoration: BoxDecoration(
+                  color: _isHovered
+                      ? _GeneralUsersViewState.kDarkGray
+                      : _GeneralUsersViewState.kOrange,
+                  borderRadius: BorderRadius.circular(8),
+                  boxShadow: _isHovered
+                      ? [
+                          BoxShadow(
+                            color: _GeneralUsersViewState.kOrange.withOpacity(
+                              0.3,
                             ),
-                          ]
-                        : [],
-                  ),
-                  child: Center(
-                    child: Text(
-                      widget.title,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
+                            blurRadius: 15,
+                            offset: const Offset(0, 8),
+                          ),
+                        ]
+                      : [],
+                ),
+                child: Center(
+                  child: Text(
+                    widget.title,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
                     ),
                   ),
                 ),

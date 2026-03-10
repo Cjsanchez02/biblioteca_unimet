@@ -1,19 +1,23 @@
-import 'package:biblioteca_unimet/ui/views/lista_sugerencias_view.dart';
+import 'package:biblioteca_unimet/ui/views/donation_view.dart';
 import 'package:biblioteca_unimet/ui/views/librarian_catalog_view.dart';
+import 'package:biblioteca_unimet/ui/views/librarian_prestamos_view.dart';
+import 'package:biblioteca_unimet/ui/views/estadisticas_view.dart';
 import 'package:flutter/material.dart';
 import 'package:biblioteca_unimet/viewmodels/auth_viewmodel.dart';
 import 'package:biblioteca_unimet/ui/views/edit_profile_view.dart';
-import 'package:biblioteca_unimet/ui/views/librarian_prestamos_view.dart';
-import 'package:biblioteca_unimet/ui/views/estadisticas_view.dart';
 
-class LibrarianView extends StatelessWidget {
+class LibrarianView extends StatefulWidget {
   const LibrarianView({super.key});
 
+  @override
+  State<LibrarianView> createState() => _LibrarianViewState();
+}
+
+class _LibrarianViewState extends State<LibrarianView> {
   static const Color kOrange = Color(0xFFF7941D);
   static const Color kDarkGray = Color(0xFF333333);
   static const Color kLightGray = Color(0xFFF4F4F4);
 
-  // Construye la estructura principal
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -52,7 +56,6 @@ class LibrarianView extends StatelessWidget {
     );
   }
 
-  // Genera la barra de navegacion superior
   Widget _buildNavbar(bool isDesktop, BuildContext context) {
     return Container(
       padding: EdgeInsets.symmetric(
@@ -83,7 +86,6 @@ class LibrarianView extends StatelessWidget {
                     ),
                   );
                 }),
-
                 _navItem('Cerrar Sesión', () {
                   showDialog(
                     context: context,
@@ -101,7 +103,6 @@ class LibrarianView extends StatelessWidget {
     );
   }
 
-  // Crea un enlace de texto individual para el menu
   Widget _navItem(String title, VoidCallback onTap) {
     return Padding(
       padding: const EdgeInsets.only(left: 30),
@@ -119,7 +120,6 @@ class LibrarianView extends StatelessWidget {
     );
   }
 
-  // Construye la seccion principal con el mensaje de bienvenida y la primera imagen
   Widget _buildHeroSection(bool isDesktop) {
     Widget textContent = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -183,37 +183,82 @@ class LibrarianView extends StatelessWidget {
     }
   }
 
-  // Renderiza los bloques de accion rapida (Catalogo, Prestamos, Sugerencias, Estadisticas)
   Widget _buildActionSection(BuildContext context, bool isDesktop) {
     List<Widget> actions = [
-      _actionBlock(Icons.menu_book, 'Catálogo', () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const LibrarianCatalogView()),
-        );
-      }),
-      _actionBlock(Icons.bookmark_added, 'Gestión y Préstamos', () {Navigator.push(
-    context,
-    MaterialPageRoute(builder: (context) => LibrarianPrestamosView()),
-  );}),
-      
-      _actionBlock(Icons.inbox, 'Sugerencias', () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const ListaSugerenciasView(),
-          ),
-        );
-      }),
-      
-      _actionBlock(Icons.bar_chart, 'Estadísticas', () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const EstadisticasView(),
-          ),
-        );
-      }),
+      _LibrarianActionCard(
+        icon: Icons.menu_book,
+        title: 'Catálogo',
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const LibrarianCatalogView(),
+            ),
+          );
+        },
+      ),
+      _LibrarianActionCard(
+        icon: Icons.bookmark_added,
+        title: 'Gestión y Préstamos',
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => LibrarianPrestamosView()),
+          );
+        },
+      ),
+      _LibrarianActionCard(
+        icon: Icons.volunteer_activism,
+        title: 'Donaciones',
+        onTap: () {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                title: const Text('Redirección a página de pagos'),
+                content: const Text(
+                  'Está a punto de ser redirigido a la plataforma de PayPal para continuar con su donación.',
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text(
+                      'Cancelar',
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                  ),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(backgroundColor: kOrange),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const DonationView(),
+                        ),
+                      );
+                    },
+                    child: const Text('Continuar'),
+                  ),
+                ],
+              );
+            },
+          );
+        },
+      ),
+      _LibrarianActionCard(
+        icon: Icons.query_stats,
+        title: 'Estadísticas',
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const EstadisticasView()),
+          );
+        },
+      ),
     ];
 
     if (isDesktop) {
@@ -241,40 +286,6 @@ class LibrarianView extends StatelessWidget {
       );
     }
   }
-
-  // Crea el diseno individual de cada boton de accion con su icono
-  Widget _actionBlock(IconData icon, String title, VoidCallback onTap) {
-    return Column(
-      children: [
-        Icon(icon, size: 60, color: Colors.black),
-        const SizedBox(height: 20),
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: kOrange,
-              padding: const EdgeInsets.symmetric(vertical: 20),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-            onPressed: onTap,
-            child: Text(
-              title,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  // Construye la seccion inferior que contiene la segunda imagen
-  // y el formulario de contacto
 
   Widget _buildFooterSection(bool isDesktop) {
     Widget imageContent = Container(
@@ -305,7 +316,7 @@ class LibrarianView extends StatelessWidget {
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: Colors.black.withValues(alpha: 0.05),
                 blurRadius: 20,
                 offset: const Offset(0, 10),
               ),
@@ -324,44 +335,8 @@ class LibrarianView extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               const Text(
-                'Reporta problemas con el catálogo o el sistema.',
+                'Contacta al administrador para reportar problemas.',
                 style: TextStyle(fontSize: 16, color: Colors.black54),
-              ),
-              const SizedBox(height: 30),
-              TextField(
-                maxLines: 4,
-                decoration: InputDecoration(
-                  hintText: 'Escribe tu reporte aquí...',
-                  hintStyle: const TextStyle(color: Colors.black38),
-                  filled: true,
-                  fillColor: kLightGray,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: kOrange,
-                    padding: const EdgeInsets.symmetric(vertical: 20),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  onPressed: () {},
-                  child: const Text(
-                    'Enviar reporte',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
               ),
             ],
           ),
@@ -428,5 +403,91 @@ class LibrarianView extends StatelessWidget {
 
   Widget _dialogoCerrarSesion(BuildContext context) {
     return _dialogoCerrCerrarSesion(context);
+  }
+}
+
+class _LibrarianActionCard extends StatefulWidget {
+  final IconData icon;
+  final String title;
+  final VoidCallback onTap;
+  final bool isSmall;
+
+  const _LibrarianActionCard({
+    required this.icon,
+    required this.title,
+    required this.onTap,
+    this.isSmall = false,
+  });
+
+  @override
+  State<_LibrarianActionCard> createState() => _LibrarianActionCardState();
+}
+
+class _LibrarianActionCardState extends State<_LibrarianActionCard> {
+  bool _isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: widget.onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 250),
+          transform: Matrix4.identity()..scale(_isHovered ? 1.05 : 1.0),
+          curve: Curves.easeOutBack,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (!widget.isSmall) ...[
+                Icon(
+                  widget.icon,
+                  size: 50,
+                  color: _isHovered
+                      ? _LibrarianViewState.kOrange
+                      : Colors.black,
+                ),
+                const SizedBox(height: 15),
+              ],
+              SizedBox(
+                width: double.infinity,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  decoration: BoxDecoration(
+                    color: _isHovered
+                        ? _LibrarianViewState.kDarkGray
+                        : _LibrarianViewState.kOrange,
+                    borderRadius: BorderRadius.circular(8),
+                    boxShadow: _isHovered
+                        ? [
+                            BoxShadow(
+                              color: _LibrarianViewState.kOrange.withValues(
+                                alpha: 0.3,
+                              ),
+                              blurRadius: 15,
+                              offset: const Offset(0, 8),
+                            ),
+                          ]
+                        : [],
+                  ),
+                  child: Center(
+                    child: Text(
+                      widget.title,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

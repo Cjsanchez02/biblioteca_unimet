@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'ui/views/general_users_view.dart';
 import 'ui/views/login_view.dart';
 
 void main() async {
@@ -17,12 +18,14 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Metroshare',
-      initialRoute: '/login',
-      routes: {'/login': (context) => const LoginView()},
+      initialRoute: '/',
+      routes: {
+        '/': (context) => const GeneralUsersView(),
+        '/login': (context) => const LoginView(),
+      },
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const LoginView(),
     );
   }
 }

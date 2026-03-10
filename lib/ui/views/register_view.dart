@@ -20,8 +20,12 @@ class _RegisterViewState extends State<RegisterView> {
     final email = _correoController.text.trim();
     final password = _passwordController.text.trim();
     final confirm = _confirmarController.text.trim();
+    final nombre = _nombreController.text.trim();
 
-    if (email.isEmpty || password.isEmpty || confirm.isEmpty) {
+    if (email.isEmpty ||
+        password.isEmpty ||
+        confirm.isEmpty ||
+        nombre.isEmpty) {
       _mostrarMensaje("Todos los campos son obligatorios", Colors.red);
       return;
     }

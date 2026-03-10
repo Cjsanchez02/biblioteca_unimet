@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
+import '../../services/servicio_donaciones.dart';
 
 class DonationView extends StatefulWidget {
   const DonationView({super.key});
 
+  @override
   @override
   State<DonationView> createState() => _DonationViewState();
 }
 
 class _DonationViewState extends State<DonationView> {
   bool _isProcessing = false;
+  final ServicioDonaciones _servicioDonaciones = ServicioDonaciones();
 
   // Variables para el monto y moneda
   final TextEditingController _montoController = TextEditingController();
@@ -26,7 +29,7 @@ class _DonationViewState extends State<DonationView> {
         return;
       }
 
-      // Intentamos validar el número. 
+      // Intentamos validar el número.
       // Si contiene letras o más de un punto, tryParse devolverá null.
       final double? valorValidado = double.tryParse(text);
 
@@ -34,7 +37,7 @@ class _DonationViewState extends State<DonationView> {
         // ERROR: El texto contiene caracteres no numéricos.
         // Eliminamos el último carácter introducido.
         final String filtrado = text.substring(0, text.length - 1);
-        
+
         // Usamos una micro-tarea para evitar errores de colisión en el renderizado
         Future.microtask(() {
           _montoController.value = TextEditingValue(
@@ -59,7 +62,18 @@ class _DonationViewState extends State<DonationView> {
 
   void _processPayment() async {
     setState(() => _isProcessing = true);
-    await Future.delayed(const Duration(seconds: 3));
+
+    try {
+      await _servicioDonaciones.guardarDonacion(_monto, _monedaSeleccionada);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+      }
+      setState(() => _isProcessing = false);
+      return;
+    }
 
     if (!mounted) return;
     setState(() => _isProcessing = false);
@@ -134,6 +148,10 @@ class _DonationViewState extends State<DonationView> {
             'Donar a Biblioteca Unimet',
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
+          const Text(
+            'Donar a Biblioteca Unimet',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
           const SizedBox(height: 30),
 
           // SECCIÓN DE MONTO Y MONEDA
@@ -146,6 +164,10 @@ class _DonationViewState extends State<DonationView> {
             ),
             child: Column(
               children: [
+                const Text(
+                  'Monto de la donación',
+                  style: TextStyle(color: Colors.grey),
+                ),
                 const Text(
                   'Monto de la donación',
                   style: TextStyle(color: Colors.grey),
@@ -172,6 +194,11 @@ class _DonationViewState extends State<DonationView> {
                           border: InputBorder.none,
                           hintText: '0.00',
                         ),
+                        onChanged: (val) {
+                          setState(() {
+                            _monto = double.tryParse(val) ?? 0.0;
+                          });
+                        },
                       ),
                     ),
                     const SizedBox(width: 10),
@@ -204,7 +231,7 @@ class _DonationViewState extends State<DonationView> {
 
           const SizedBox(height: 25),
 
-          // MÉTODO DE PAGO SIMULADO (ESTILO PAYPAL)
+          // METODO DE PAGO SIMULADO (ESTILO PAYPAL)
           const Align(
             alignment: Alignment.centerLeft,
             child: Text(
@@ -226,6 +253,14 @@ class _DonationViewState extends State<DonationView> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Text(
+                      'Visa •••• 4242',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      'Tarjeta de crédito principal',
+                      style: TextStyle(fontSize: 12, color: Colors.grey),
+                    ),
                     Text(
                       'Visa •••• 4242',
                       style: TextStyle(fontWeight: FontWeight.bold),
@@ -267,12 +302,16 @@ class _DonationViewState extends State<DonationView> {
             'Transacción protegida por PayPal',
             style: TextStyle(fontSize: 12, color: Colors.grey),
           ),
+          const Text(
+            'Transacción protegida por PayPal',
+            style: TextStyle(fontSize: 12, color: Colors.grey),
+          ),
         ],
       ),
     );
   }
 
-  // Los métodos _buildProcessingState y _buildWarningBanner se mantienen igual...
+  // Construye la pantalla de carga que se muestra mientras se procesa la donacion
   Widget _buildProcessingState() {
     return const Center(
       child: Column(
@@ -284,11 +323,16 @@ class _DonationViewState extends State<DonationView> {
             'Conectando con PayPal...',
             style: TextStyle(fontWeight: FontWeight.w500),
           ),
+          Text(
+            'Conectando con PayPal...',
+            style: TextStyle(fontWeight: FontWeight.w500),
+          ),
         ],
       ),
     );
   }
 
+  // Construye el banner de advertencia que indica que la transaccion es una simulacion
   Widget _buildWarningBanner() {
     return Container(
       width: double.infinity,
