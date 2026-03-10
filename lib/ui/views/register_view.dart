@@ -30,9 +30,9 @@ class _RegisterViewState extends State<RegisterView> {
       return;
     }
 
-    if (!email.endsWith('@correo.unimet.edu.ve')) {
+    if (!email.endsWith('@correo.unimet.edu.ve') && !email.endsWith('@unimet.edu.ve')) {
       _mostrarMensaje(
-        "Solo se permiten correos @correo.unimet.edu.ve",
+        "Solo se permiten correos @correo.unimet.edu.ve o @unimet.edu.ve",
         Colors.red,
       );
       return;
@@ -43,11 +43,8 @@ class _RegisterViewState extends State<RegisterView> {
       return;
     }
 
-    if (password.length < 6) {
-      _mostrarMensaje(
-        "La contraseña debe tener al menos 6 caracteres",
-        Colors.red,
-      );
+    if (!UsuarioGeneral.validarPassword(password)) {
+      _mostrarMensaje(UsuarioGeneral.mensajeErrorPassword, Colors.red);
       return;
     }
 
@@ -111,8 +108,8 @@ class _RegisterViewState extends State<RegisterView> {
               ),
               const SizedBox(height: 30),
 
-              const Text(
-                "Registrate con tu correo UNIMET",
+               const Text(
+                "Regístrate con tu correo @correo.unimet.edu.ve o @unimet.edu.ve",
                 style: TextStyle(fontSize: 19, color: Color(0xFF666666)),
               ),
               const SizedBox(height: 30),

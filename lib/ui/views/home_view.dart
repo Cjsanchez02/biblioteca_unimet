@@ -2,12 +2,12 @@ import 'package:biblioteca_unimet/ui/views/donation_view.dart';
 import 'package:biblioteca_unimet/ui/views/user_catalog_view.dart';
 import 'package:biblioteca_unimet/ui/views/mymaterial_view.dart';
 import 'package:flutter/material.dart';
-import 'package:biblioteca_unimet/viewmodels/auth_viewmodel.dart';
-import 'package:biblioteca_unimet/ui/views/edit_profile_view.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:biblioteca_unimet/viewmodels/sugerencia_viewmodel.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:biblioteca_unimet/ui/widgets/dialog_calification.dart';
+import 'package:biblioteca_unimet/ui/views/edit_profile_view.dart';
+import 'package:biblioteca_unimet/viewmodels/auth_viewmodel.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -17,9 +17,12 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
-  // Construye la estructura principal
   final TextEditingController _sugerenciaController = TextEditingController();
   final HomeViewModel _viewModel = HomeViewModel();
+
+  static const Color kOrange = Color(0xFFF7941D);
+  static const Color kDarkGray = Color(0xFF333333);
+  static const Color kLightGray = Color(0xFFF4F4F4);
 
   @override
   void initState() {
@@ -32,14 +35,11 @@ class _HomeViewState extends State<HomeView> {
     });
   }
 
-  // La función que busca en Firebase y lanza el pop-up
   Future<void> _verificarCalificacionesPendientes(
     BuildContext context,
     String correoUsuario,
   ) async {
     final db = FirebaseFirestore.instance;
-
-    // Buscamos los préstamos de este estudiante marcados como 'devuelto'
     final pendientes = await db
         .collection('prestamos')
         .where('correoSolicitante', isEqualTo: correoUsuario)
@@ -48,13 +48,8 @@ class _HomeViewState extends State<HomeView> {
 
     for (var doc in pendientes.docs) {
       final data = doc.data();
+      bool yaFueCalificado = data.containsKey('calificado') ? data['calificado'] : false;
 
-      // Verificamos si ya existe la bandera 'calificado' y si es true
-      bool yaFueCalificado = data.containsKey('calificado')
-          ? data['calificado']
-          : false;
-
-      // Si no ha sido calificado, mostramos el Dialog
       if (!yaFueCalificado && context.mounted) {
         await showDialog(
           context: context,
@@ -74,10 +69,6 @@ class _HomeViewState extends State<HomeView> {
     _sugerenciaController.dispose();
     super.dispose();
   }
-
-  static const Color kOrange = Color(0xFFF7941D);
-  static const Color kDarkGray = Color(0xFF333333);
-  static const Color kLightGray = Color(0xFFF4F4F4);
 
   @override
   Widget build(BuildContext context) {
@@ -132,35 +123,29 @@ class _HomeViewState extends State<HomeView> {
             style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.bold,
-              color: _HomeViewState.kDarkGray,
+              color: kDarkGray,
             ),
           ),
           if (isDesktop)
             Row(
               children: [
                 _navItem('Inicio', () {}),
-                _navItem('Servicios', () {}),
-                _navItem('Contactanos', () {}),
                 _navItem('Editar Perfil', () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                      builder: (context) => const EditProfileView(),
-                    ),
+                    MaterialPageRoute(builder: (context) => const EditProfileView()),
                   );
                 }),
                 _navItem('Cerrar Sesión', () {
                   showDialog(
                     context: context,
-                    builder: (BuildContext context) {
-                      return _dialogoCerrarSesion(context);
-                    },
+                    builder: (BuildContext context) => _dialogoCerrarSesion(context),
                   );
                 }),
               ],
             )
           else
-            const Icon(Icons.menu, color: _HomeViewState.kDarkGray),
+            const Icon(Icons.menu, color: kDarkGray),
         ],
       ),
     );
@@ -176,7 +161,7 @@ class _HomeViewState extends State<HomeView> {
           style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w500,
-            color: _HomeViewState.kDarkGray,
+            color: kDarkGray,
           ),
         ),
       ),
@@ -189,18 +174,10 @@ class _HomeViewState extends State<HomeView> {
       children: [
         RichText(
           text: const TextSpan(
-            style: TextStyle(
-              fontSize: 48,
-              fontWeight: FontWeight.bold,
-              color: _HomeViewState.kDarkGray,
-              height: 1.1,
-            ),
+            style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold, color: kDarkGray, height: 1.1),
             children: [
               TextSpan(text: 'Un Puente entre\nsiglos de '),
-              TextSpan(
-                text: 'saber',
-                style: TextStyle(color: _HomeViewState.kOrange),
-              ),
+              TextSpan(text: 'saber', style: TextStyle(color: kOrange)),
             ],
           ),
         ),
@@ -213,7 +190,12 @@ class _HomeViewState extends State<HomeView> {
         _HomeActionCard(
           title: 'Explorar Biblioteca',
           icon: Icons.search,
-          onTap: () {},
+          onTap: () {
+             Navigator.push(
+               context,
+               MaterialPageRoute(builder: (context) => const UserCatalogView()),
+             );
+          },
           isSmall: true,
           paddingHorizontal: 40,
         ),
@@ -224,7 +206,7 @@ class _HomeViewState extends State<HomeView> {
       height: 400,
       width: double.infinity,
       decoration: BoxDecoration(
-        color: _HomeViewState.kLightGray,
+        color: kLightGray,
         borderRadius: BorderRadius.circular(20),
       ),
       child: ClipRRect(
@@ -275,8 +257,7 @@ class _HomeViewState extends State<HomeView> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) =>
-                    MisPrestamosView(correoUsuario: usuario.email!),
+                builder: (context) => MisPrestamosView(correoUsuario: usuario.email!),
               ),
             );
           }
@@ -285,71 +266,47 @@ class _HomeViewState extends State<HomeView> {
       _HomeActionCard(
         icon: Icons.volunteer_activism,
         title: 'Donaciones',
-        onTap: () {
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                title: const Text('Redirección a página de pagos'),
-                content: const Text(
-                  'Está a punto de ser redirigido a la plataforma de PayPal para continuar con su donación.',
-                ),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text(
-                      'Cancelar',
-                      style: TextStyle(color: Colors.grey),
-                    ),
-                  ),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(backgroundColor: kOrange),
-                    onPressed: () {
-                      Navigator.pop(context);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const DonationView(),
-                        ),
-                      );
-                    },
-                    child: const Text('Continuar'),
-                  ),
-                ],
-              );
-            },
-          );
-        },
+        onTap: () => _mostrarDialogoDonacion(context),
       ),
     ];
 
     if (isDesktop) {
       return Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: actions
-            .map(
-              (a) => Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15),
-                  child: a,
-                ),
-              ),
-            )
-            .toList(),
+        children: actions.map((a) => Expanded(child: Padding(padding: const EdgeInsets.symmetric(horizontal: 15), child: a))).toList(),
       );
     } else {
       return Column(
-        children: actions
-            .map(
-              (a) =>
-                  Padding(padding: const EdgeInsets.only(bottom: 30), child: a),
-            )
-            .toList(),
+        children: actions.map((a) => Padding(padding: const EdgeInsets.only(bottom: 30), child: a)).toList(),
       );
     }
+  }
+
+  void _mostrarDialogoDonacion(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          title: const Text('Redirección a página de pagos'),
+          content: const Text('Está a punto de ser redirigido a la plataforma de PayPal para continuar con su donación.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancelar', style: TextStyle(color: Colors.grey)),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: kOrange),
+              onPressed: () {
+                Navigator.pop(context);
+                Navigator.push(context, MaterialPageRoute(builder: (context) => const DonationView()));
+              },
+              child: const Text('Continuar'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Widget _buildFooterSection(bool isDesktop) {
@@ -357,7 +314,7 @@ class _HomeViewState extends State<HomeView> {
       height: 350,
       width: double.infinity,
       decoration: BoxDecoration(
-        color: _HomeViewState.kLightGray,
+        color: kLightGray,
         borderRadius: BorderRadius.circular(20),
       ),
       child: ClipRRect(
@@ -390,18 +347,42 @@ class _HomeViewState extends State<HomeView> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                '¿Necesitas ayuda?',
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: _HomeViewState.kDarkGray,
+              const Text('¿Necesitas ayuda?', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: kDarkGray)),
+              const SizedBox(height: 10),
+              const Text('¿No conseguiste el libro que buscabas? Pídelo aquí.', style: TextStyle(fontSize: 16, color: Colors.black54)),
+              const SizedBox(height: 20),
+              TextField(
+                controller: _sugerenciaController,
+                decoration: InputDecoration(
+                  hintText: 'Escribe el título o autor...',
+                  filled: true,
+                  fillColor: kLightGray,
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
                 ),
               ),
-              const SizedBox(height: 10),
-              const Text(
-                'Habla con nuestro bibliotecario.',
-                style: TextStyle(fontSize: 16, color: Colors.black54),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: kOrange,
+                    padding: const EdgeInsets.symmetric(vertical: 15),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                  onPressed: () async {
+                    final texto = _sugerenciaController.text;
+                    bool enviado = await _viewModel.enviarSugerencia(texto, context);
+                    if (enviado) {
+                      _sugerenciaController.clear();
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Sugerencia enviada correctamente'), backgroundColor: Colors.green),
+                        );
+                      }
+                    }
+                  },
+                  child: const Text('Solicitar libro', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                ),
               ),
             ],
           ),
@@ -411,15 +392,8 @@ class _HomeViewState extends State<HomeView> {
           right: -20,
           child: CircleAvatar(
             radius: 30,
-            backgroundColor: _HomeViewState.kDarkGray,
-            child: const Text(
-              '?',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+            backgroundColor: kDarkGray,
+            child: const Text('?', style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
           ),
         ),
       ],
@@ -428,16 +402,10 @@ class _HomeViewState extends State<HomeView> {
     if (isDesktop) {
       return Row(
         crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Expanded(flex: 5, child: imageContent),
-          const SizedBox(width: 60),
-          Expanded(flex: 5, child: formContent),
-        ],
+        children: [Expanded(flex: 5, child: imageContent), const SizedBox(width: 60), Expanded(flex: 5, child: formContent)],
       );
     } else {
-      return Column(
-        children: [formContent, const SizedBox(height: 40), imageContent],
-      );
+      return Column(children: [formContent, const SizedBox(height: 40), imageContent]);
     }
   }
 
@@ -445,31 +413,18 @@ class _HomeViewState extends State<HomeView> {
     return AlertDialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       title: const Row(
-        children: [
-          Icon(Icons.warning_amber_outlined, color: _HomeViewState.kOrange),
-          SizedBox(width: 10),
-          Text('Cerrar Sesión'),
-        ],
+        children: [Icon(Icons.warning_amber_outlined, color: kOrange), SizedBox(width: 10), Text('Cerrar Sesión')],
       ),
       content: const Text('¿Estás seguro de que deseas cerrar sesión?'),
       actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('Cancelar', style: TextStyle(color: Colors.black)),
-        ),
+        TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar', style: TextStyle(color: Colors.black))),
         ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: _HomeViewState.kOrange,
-          ),
+          style: ElevatedButton.styleFrom(backgroundColor: kOrange),
           onPressed: () async {
             Navigator.pop(context);
-            final vm = AuthViewModel();
-            await vm.cerrarSesion(context);
+            await AuthViewModel().cerrarSesion(context);
           },
-          child: const Text(
-            'Cerrar Sesión',
-            style: TextStyle(color: Colors.black),
-          ),
+          child: const Text('Cerrar Sesión', style: TextStyle(color: Colors.black)),
         ),
       ],
     );
@@ -483,13 +438,7 @@ class _HomeActionCard extends StatefulWidget {
   final bool isSmall;
   final double paddingHorizontal;
 
-  const _HomeActionCard({
-    required this.icon,
-    required this.title,
-    required this.onTap,
-    this.isSmall = false,
-    this.paddingHorizontal = 0,
-  });
+  const _HomeActionCard({required this.icon, required this.title, required this.onTap, this.isSmall = false, this.paddingHorizontal = 0});
 
   @override
   State<_HomeActionCard> createState() => _HomeActionCardState();
@@ -514,45 +463,19 @@ class _HomeActionCardState extends State<_HomeActionCard> {
             mainAxisSize: MainAxisSize.min,
             children: [
               if (!widget.isSmall) ...[
-                Icon(
-                  widget.icon,
-                  size: 50,
-                  color: _isHovered ? _HomeViewState.kOrange : Colors.black,
-                ),
+                Icon(widget.icon, size: 50, color: _isHovered ? _HomeViewState.kOrange : Colors.black),
                 const SizedBox(height: 15),
               ],
               Container(
                 width: widget.paddingHorizontal > 0 ? null : double.infinity,
-                padding: EdgeInsets.symmetric(
-                  vertical: 16,
-                  horizontal: widget.paddingHorizontal,
-                ),
+                padding: EdgeInsets.symmetric(vertical: 16, horizontal: widget.paddingHorizontal),
                 decoration: BoxDecoration(
-                  color: _isHovered
-                      ? _HomeViewState.kDarkGray
-                      : _HomeViewState.kOrange,
+                  color: _isHovered ? _HomeViewState.kDarkGray : _HomeViewState.kOrange,
                   borderRadius: BorderRadius.circular(8),
-                  boxShadow: _isHovered
-                      ? [
-                          BoxShadow(
-                            color: _HomeViewState.kOrange.withValues(
-                              alpha: 0.3,
-                            ),
-                            blurRadius: 15,
-                            offset: const Offset(0, 8),
-                          ),
-                        ]
-                      : [],
+                  boxShadow: _isHovered ? [BoxShadow(color: _HomeViewState.kOrange.withValues(alpha: 0.3), blurRadius: 15, offset: const Offset(0, 8))] : [],
                 ),
                 child: Center(
-                  child: Text(
-                    widget.title,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
+                  child: Text(widget.title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
                 ),
               ),
             ],

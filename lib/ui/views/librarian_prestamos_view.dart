@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:biblioteca_unimet/services/servicio_biblioteca.dart';
+import '../widgets/admin_navbar.dart';
+import '../widgets/custom_navbars.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class LibrarianPrestamosView extends StatelessWidget {
   LibrarianPrestamosView({super.key});
@@ -13,33 +16,28 @@ class LibrarianPrestamosView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Agregamos DefaultTabController para manejar las dos listas
     return DefaultTabController(
       length: 2,
       child: Scaffold(
         backgroundColor: Colors.white,
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          elevation: 0,
-          toolbarHeight: 0, // Ocultamos la barra de herramientas del AppBar
-          bottom: const TabBar(
-            labelColor: kOrange,
-            unselectedLabelColor: kDarkGray,
-            indicatorColor: kOrange,
-            tabs: [
-              Tab(text: "SOLICITUDES", icon: Icon(Icons.pending_actions)),
-              Tab(text: "ENTREGADOS", icon: Icon(Icons.book_rounded)),
-            ],
-          ),
-        ),
-        body: LayoutBuilder(
-          builder: (context, constraints) {
-            bool isDesktop = constraints.maxWidth > 800;
-            return Column(
-              children: [
-                _buildNavbar(isDesktop, context),
-                Expanded(
-                  child: Padding(
+        body: Column(
+          children: [
+            _buildRoleNavbar(),
+            const Divider(height: 1),
+            const TabBar(
+              labelColor: kOrange,
+              unselectedLabelColor: kDarkGray,
+              indicatorColor: kOrange,
+              tabs: [
+                Tab(text: "SOLICITUDES", icon: Icon(Icons.pending_actions)),
+                Tab(text: "ENTREGADOS", icon: Icon(Icons.book_rounded)),
+              ],
+            ),
+            Expanded(
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  bool isDesktop = constraints.maxWidth > 800;
+                  return Padding(
                     padding: EdgeInsets.symmetric(
                       horizontal: isDesktop ? 80.0 : 20.0,
                       vertical: 20.0,
@@ -60,41 +58,19 @@ class LibrarianPrestamosView extends StatelessWidget {
                         Expanded(
                           child: TabBarView(
                             children: [
-                              // Pestaña 1: Solo los 'solicitado'
                               _buildListaFiltrada('solicitado'),
-                              // Pestaña 2: Solo los 'aprobado' (para devolver)
                               _buildListaFiltrada('aprobado'),
                             ],
                           ),
                         ),
                       ],
                     ),
-                  ),
-                ),
-              ],
-            );
-          },
+                  );
+                },
+              ),
+            ),
+          ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildNavbar(bool isDesktop, BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: isDesktop ? 80.0 : 20.0, vertical: 20),
-      color: Colors.white,
-      child: Row(
-        children: [
-          IconButton(
-            icon: const Icon(Icons.arrow_back, color: kDarkGray),
-            onPressed: () => Navigator.pop(context),
-          ),
-          const SizedBox(width: 10),
-          const Text(
-            'MetroShare - Bibliotecario',
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: kDarkGray),
-          ),
-        ],
       ),
     );
   }
@@ -110,7 +86,7 @@ class LibrarianPrestamosView extends StatelessWidget {
           return const Center(child: CircularProgressIndicator(color: kOrange));
         }
 
-        if (snapshot.data!.docs.isEmpty) {
+        if (snapshot.data == null || snapshot.data!.docs.isEmpty) {
           return Center(
             child: Text(
               estadoFiltro == 'solicitado' 
@@ -157,7 +133,6 @@ class LibrarianPrestamosView extends StatelessWidget {
     );
   }
 
-  // BOTONES PARA LA LISTA DE SOLICITUDES
   Widget _buildBotonesSolicitud(BuildContext context, String pId, String mId) {
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -181,7 +156,6 @@ class LibrarianPrestamosView extends StatelessWidget {
     );
   }
 
-  // BOTÓN PARA LA LISTA DE ENTREGADOS (DEVOLUCIÓN)
   Widget _buildBotonDevolucion(BuildContext context, String pId, String mId) {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
@@ -194,6 +168,25 @@ class LibrarianPrestamosView extends StatelessWidget {
         }
       },
       child: const Text('Marcar Devolución', style: TextStyle(color: Colors.white)),
+    );
+  }
+  Widget _buildRoleNavbar() {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return const SizedBox.shrink();
+
+    return FutureBuilder<DocumentSnapshot>(
+      future: FirebaseFirestore.instance.collection('usuarios').doc(user.uid).get(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) return const SizedBox(height: 80);
+        final data = snapshot.data!.data() as Map<String, dynamic>?;
+        final role = data?['rol'] ?? 'Usuario Normal';
+
+        if (role == 'Administrador') {
+          return const AdminNavbar(activeTab: AdminTab.prestamos);
+        } else {
+          return const LibrarianNavbar(activeTab: LibrarianTab.prestamos);
+        }
+      },
     );
   }
 }

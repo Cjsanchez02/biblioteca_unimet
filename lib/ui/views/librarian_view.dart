@@ -81,17 +81,13 @@ class _LibrarianViewState extends State<LibrarianView> {
                 _navItem('Editar Perfil', () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                      builder: (context) => const EditProfileView(),
-                    ),
+                    MaterialPageRoute(builder: (context) => const EditProfileView()),
                   );
                 }),
                 _navItem('Cerrar Sesión', () {
                   showDialog(
                     context: context,
-                    builder: (BuildContext context) {
-                      return _dialogoCerrarSesion(context);
-                    },
+                    builder: (BuildContext context) => _dialogoCerrarSesion(context),
                   );
                 }),
               ],
@@ -126,24 +122,16 @@ class _LibrarianViewState extends State<LibrarianView> {
       children: [
         RichText(
           text: const TextSpan(
-            style: TextStyle(
-              fontSize: 48,
-              fontWeight: FontWeight.bold,
-              color: kDarkGray,
-              height: 1.1,
-            ),
+            style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold, color: kDarkGray, height: 1.1),
             children: [
               TextSpan(text: 'Panel de\nGestión '),
-              TextSpan(
-                text: 'Bibliotecaria',
-                style: TextStyle(color: kOrange),
-              ),
+              TextSpan(text: 'Bibliotecaria', style: TextStyle(color: kOrange)),
             ],
           ),
         ),
         const SizedBox(height: 20),
         const Text(
-          'Administra con eficiencia el corazón de la Universidad Metropolitana. Desde este panel, tienes las herramientas necesarias para supervisar el flujo de conocimiento: gestiona el catálogo completo, monitorea los préstamos activos de los estudiantes, analiza las métricas de uso y asegura que cada recurso esté al alcance de nuestra comunidad académica.',
+          'Administra con eficiencia el corazón de la Universidad Metropolitana. Desde este panel, tienes las herramientas necesarias para supervisar el flujo de conocimiento.',
           style: TextStyle(fontSize: 20, color: Colors.black54, height: 1.6),
         ),
       ],
@@ -170,16 +158,10 @@ class _LibrarianViewState extends State<LibrarianView> {
     if (isDesktop) {
       return Row(
         crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Expanded(flex: 5, child: textContent),
-          const SizedBox(width: 60),
-          Expanded(flex: 5, child: imageContent),
-        ],
+        children: [Expanded(flex: 5, child: textContent), const SizedBox(width: 60), Expanded(flex: 5, child: imageContent)],
       );
     } else {
-      return Column(
-        children: [imageContent, const SizedBox(height: 40), textContent],
-      );
+      return Column(children: [imageContent, const SizedBox(height: 40), textContent]);
     }
   }
 
@@ -189,74 +171,26 @@ class _LibrarianViewState extends State<LibrarianView> {
         icon: Icons.menu_book,
         title: 'Catálogo',
         onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const LibrarianCatalogView(),
-            ),
-          );
+          Navigator.push(context, MaterialPageRoute(builder: (context) => const LibrarianCatalogView()));
         },
       ),
       _LibrarianActionCard(
         icon: Icons.bookmark_added,
         title: 'Gestión y Préstamos',
         onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => LibrarianPrestamosView()),
-          );
+          Navigator.push(context, MaterialPageRoute(builder: (context) => LibrarianPrestamosView()));
         },
       ),
       _LibrarianActionCard(
         icon: Icons.volunteer_activism,
         title: 'Donaciones',
-        onTap: () {
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                title: const Text('Redirección a página de pagos'),
-                content: const Text(
-                  'Está a punto de ser redirigido a la plataforma de PayPal para continuar con su donación.',
-                ),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text(
-                      'Cancelar',
-                      style: TextStyle(color: Colors.grey),
-                    ),
-                  ),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(backgroundColor: kOrange),
-                    onPressed: () {
-                      Navigator.pop(context);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const DonationView(),
-                        ),
-                      );
-                    },
-                    child: const Text('Continuar'),
-                  ),
-                ],
-              );
-            },
-          );
-        },
+        onTap: () => _mostrarDialogoDonacion(context),
       ),
       _LibrarianActionCard(
         icon: Icons.query_stats,
         title: 'Estadísticas',
         onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const EstadisticasView()),
-          );
+          Navigator.push(context, MaterialPageRoute(builder: (context) => const EstadisticasView()));
         },
       ),
     ];
@@ -264,45 +198,45 @@ class _LibrarianViewState extends State<LibrarianView> {
     if (isDesktop) {
       return Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: actions
-            .map(
-              (a) => Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  child: a,
-                ),
-              ),
-            )
-            .toList(),
+        children: actions.map((a) => Expanded(child: Padding(padding: const EdgeInsets.symmetric(horizontal: 10), child: a))).toList(),
       );
     } else {
-      return Column(
-        children: actions
-            .map(
-              (a) =>
-                  Padding(padding: const EdgeInsets.only(bottom: 30), child: a),
-            )
-            .toList(),
-      );
+      return Column(children: actions.map((a) => Padding(padding: const EdgeInsets.only(bottom: 30), child: a)).toList());
     }
+  }
+
+  void _mostrarDialogoDonacion(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          title: const Text('Redirección a página de pagos'),
+          content: const Text('Está a punto de ser redirigido a la plataforma de PayPal para continuar con su donación.'),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar', style: TextStyle(color: Colors.grey))),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: kOrange),
+              onPressed: () {
+                Navigator.pop(context);
+                Navigator.push(context, MaterialPageRoute(builder: (context) => const DonationView()));
+              },
+              child: const Text('Continuar'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Widget _buildFooterSection(bool isDesktop) {
     Widget imageContent = Container(
       height: 350,
       width: double.infinity,
-      decoration: BoxDecoration(
-        color: kLightGray,
-        borderRadius: BorderRadius.circular(20),
-      ),
+      decoration: BoxDecoration(color: kLightGray, borderRadius: BorderRadius.circular(20)),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(20),
-        child: Image.asset(
-          'assets/images/pasillobiblioteca.jpg',
-          fit: BoxFit.cover,
-          width: double.infinity,
-          height: double.infinity,
-        ),
+        child: Image.asset('assets/images/pasillobiblioteca.jpg', fit: BoxFit.cover, width: double.infinity, height: double.infinity),
       ),
     );
 
@@ -314,41 +248,21 @@ class _LibrarianViewState extends State<LibrarianView> {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
-                blurRadius: 20,
-                offset: const Offset(0, 10),
-              ),
-            ],
+            boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 20, offset: const Offset(0, 10))],
           ),
-          child: Column(
+          child: const Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Consultas Técnicas',
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: kDarkGray,
-                ),
-              ),
-              const SizedBox(height: 10),
-              const Text(
-                'Contacta al administrador para reportar problemas.',
-                style: TextStyle(fontSize: 16, color: Colors.black54),
-              ),
+              Text('Consultas Técnicas', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: kDarkGray)),
+              SizedBox(height: 10),
+              Text('Contacta al administrador para reportar problemas.', style: TextStyle(fontSize: 16, color: Colors.black54)),
             ],
           ),
         ),
         Positioned(
           top: -20,
           right: -20,
-          child: CircleAvatar(
-            radius: 30,
-            backgroundColor: kDarkGray,
-            child: const Icon(Icons.support_agent, color: Colors.white),
-          ),
+          child: CircleAvatar(radius: 30, backgroundColor: kDarkGray, child: const Icon(Icons.support_agent, color: Colors.white)),
         ),
       ],
     );
@@ -356,53 +270,32 @@ class _LibrarianViewState extends State<LibrarianView> {
     if (isDesktop) {
       return Row(
         crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Expanded(flex: 5, child: imageContent),
-          const SizedBox(width: 60),
-          Expanded(flex: 5, child: formContent),
-        ],
+        children: [Expanded(flex: 5, child: imageContent), const SizedBox(width: 60), Expanded(flex: 5, child: formContent)],
       );
     } else {
-      return Column(
-        children: [formContent, const SizedBox(height: 40), imageContent],
-      );
+      return Column(children: [formContent, const SizedBox(height: 40), imageContent]);
     }
   }
 
-  Widget _dialogoCerrCerrarSesion(BuildContext context) {
+  Widget _dialogoCerrarSesion(BuildContext context) {
     return AlertDialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       title: const Row(
-        children: [
-          Icon(Icons.warning_amber_outlined, color: kOrange),
-          SizedBox(width: 10),
-          Text('Cerrar Sesión'),
-        ],
+        children: [Icon(Icons.warning_amber_outlined, color: kOrange), SizedBox(width: 10), Text('Cerrar Sesión')],
       ),
       content: const Text('¿Estás seguro de que deseas cerrar sesión?'),
       actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('Cancelar', style: TextStyle(color: Colors.black)),
-        ),
+        TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar', style: TextStyle(color: Colors.black))),
         ElevatedButton(
           style: ElevatedButton.styleFrom(backgroundColor: kOrange),
           onPressed: () async {
             Navigator.pop(context);
-            final vm = AuthViewModel();
-            await vm.cerrarSesion(context);
+            await AuthViewModel().cerrarSesion(context);
           },
-          child: const Text(
-            'Cerrar Sesión',
-            style: TextStyle(color: Colors.black),
-          ),
+          child: const Text('Cerrar Sesión', style: TextStyle(color: Colors.black)),
         ),
       ],
     );
-  }
-
-  Widget _dialogoCerrarSesion(BuildContext context) {
-    return _dialogoCerrCerrarSesion(context);
   }
 }
 
@@ -412,12 +305,7 @@ class _LibrarianActionCard extends StatefulWidget {
   final VoidCallback onTap;
   final bool isSmall;
 
-  const _LibrarianActionCard({
-    required this.icon,
-    required this.title,
-    required this.onTap,
-    this.isSmall = false,
-  });
+  const _LibrarianActionCard({required this.icon, required this.title, required this.onTap, this.isSmall = false});
 
   @override
   State<_LibrarianActionCard> createState() => _LibrarianActionCardState();
@@ -442,13 +330,7 @@ class _LibrarianActionCardState extends State<_LibrarianActionCard> {
             mainAxisSize: MainAxisSize.min,
             children: [
               if (!widget.isSmall) ...[
-                Icon(
-                  widget.icon,
-                  size: 50,
-                  color: _isHovered
-                      ? _LibrarianViewState.kOrange
-                      : Colors.black,
-                ),
+                Icon(widget.icon, size: 50, color: _isHovered ? _LibrarianViewState.kOrange : Colors.black),
                 const SizedBox(height: 15),
               ],
               SizedBox(
@@ -456,31 +338,12 @@ class _LibrarianActionCardState extends State<_LibrarianActionCard> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   decoration: BoxDecoration(
-                    color: _isHovered
-                        ? _LibrarianViewState.kDarkGray
-                        : _LibrarianViewState.kOrange,
+                    color: _isHovered ? _LibrarianViewState.kDarkGray : _LibrarianViewState.kOrange,
                     borderRadius: BorderRadius.circular(8),
-                    boxShadow: _isHovered
-                        ? [
-                            BoxShadow(
-                              color: _LibrarianViewState.kOrange.withValues(
-                                alpha: 0.3,
-                              ),
-                              blurRadius: 15,
-                              offset: const Offset(0, 8),
-                            ),
-                          ]
-                        : [],
+                    boxShadow: _isHovered ? [BoxShadow(color: _LibrarianViewState.kOrange.withValues(alpha: 0.3), blurRadius: 15, offset: const Offset(0, 8))] : [],
                   ),
                   child: Center(
-                    child: Text(
-                      widget.title,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
+                    child: Text(widget.title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
                   ),
                 ),
               ),
