@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:biblioteca_unimet/viewmodels/auth_viewmodel.dart';
 import 'package:biblioteca_unimet/ui/views/edit_profile_view.dart';
 import 'package:biblioteca_unimet/ui/views/estadisticas_view.dart';
+import 'package:biblioteca_unimet/ui/views/lista_sugerencias_view.dart';
 
 class AdminView extends StatelessWidget {
   const AdminView({super.key});
@@ -39,7 +40,7 @@ class AdminView extends StatelessWidget {
                       const SizedBox(height: 60),
                       const Divider(thickness: 1, color: Colors.black12),
                       const SizedBox(height: 60),
-                      _buildFooterSection(isDesktop),
+                      _buildFooterSection(context, isDesktop),
                       const SizedBox(height: 60),
                     ],
                   ),
@@ -305,8 +306,7 @@ class AdminView extends StatelessWidget {
 
   // Construye la seccion inferior que contiene la segunda imagen
   // y el formulario de contacto
-
-  Widget _buildFooterSection(bool isDesktop) {
+  Widget _buildFooterSection(BuildContext context, bool isDesktop) { 
     Widget imageContent = Container(
       height: 350,
       width: double.infinity,
@@ -365,7 +365,15 @@ class AdminView extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              onPressed: () {},
+              onPressed: () {
+                //Agregamos la navegación a tu Buzón de Sugerencias
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ListaSugerenciasView(),
+                  ),
+                );
+              },
               child: const Text(
                 'Ver reportes',
                 style: TextStyle(
@@ -395,7 +403,6 @@ class AdminView extends StatelessWidget {
       );
     }
   }
-
   Widget _dialogoCerrarSesion(BuildContext context) {
     return AlertDialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
