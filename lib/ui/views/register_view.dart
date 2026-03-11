@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../models/UsuarioGeneral.dart';
 
 class RegisterView extends StatefulWidget {
@@ -26,9 +27,9 @@ class _RegisterViewState extends State<RegisterView> {
       return;
     }
 
-    if (!email.endsWith('@correo.unimet.edu.ve')) {
+    if (!email.endsWith('@correo.unimet.edu.ve') && !email.endsWith('@unimet.edu.ve')) {
       _mostrarMensaje(
-        "Solo se permiten correos @correo.unimet.edu.ve",
+        "Solo se permiten correos @correo.unimet.edu.ve o @unimet.edu.ve",
         Colors.red,
       );
       return;
@@ -44,6 +45,21 @@ class _RegisterViewState extends State<RegisterView> {
         "La contraseña debe tener al menos 6 caracteres",
         Colors.red,
       );
+      return;
+    }
+
+    if (!password.contains(RegExp(r'[A-Z]'))) {
+      _mostrarMensaje("La contraseña debe incluir al menos una mayúscula", Colors.red);
+      return;
+    }
+
+    if (!password.contains(RegExp(r'[a-z]'))) {
+      _mostrarMensaje("La contraseña debe incluir al menos una minúscula", Colors.red);
+      return;
+    }
+
+    if (!password.contains(RegExp(r'[!@#$%^&*()_,\¿/.?":{}|<>]'))) {
+      _mostrarMensaje("La contraseña debe incluir un carácter especial (ej: !@#)", Colors.red);
       return;
     }
 
@@ -119,6 +135,7 @@ class _RegisterViewState extends State<RegisterView> {
                 "Nombre y Apellido",
                 Icons.person_outline,
                 false,
+                soloLetras: true,
               ),
               const SizedBox(height: 20),
               // Campo Correo
@@ -185,11 +202,16 @@ class _RegisterViewState extends State<RegisterView> {
     TextEditingController controller,
     String label,
     IconData icon,
-    bool isPassword,
+    bool isPassword,{
+      bool soloLetras = false,
+    }
   ) {
     return TextField(
       controller: controller,
       obscureText: isPassword,
+      inputFormatters: soloLetras
+        ? [FilteringTextInputFormatter.allow(RegExp(r'[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]'))] 
+        : null,
       decoration: InputDecoration(
         labelText: label,
         filled: true,

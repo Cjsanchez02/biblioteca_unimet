@@ -50,6 +50,10 @@ class _AdminMaterialFormState extends State<AdminMaterialForm> {
     if (RegExp(r'^[0-9]+$').hasMatch(value)) {
       return 'No puede contener solo números';
     }
+    if (RegExp(r'^[!@#\$%\^&\*\(\)_\+\-=\[\]\{\};:"\\|,.<>\/?]+$')
+        .hasMatch(value)) {
+      return 'No puede contener solo caracteres especiales';
+    }
     return null;
   }
 
