@@ -46,6 +46,15 @@ class BibliotecaService {
         }
       }
       
+      // Consultamos el documento del libro directamente a Firebase para asegurar la materia
+      DocumentSnapshot libroDoc = await _db.collection('material_academico').doc(libro.id).get();
+      String materiaReal = 'Sin Materia'; 
+      
+      if (libroDoc.exists) {
+        final dataLibro = libroDoc.data() as Map<String, dynamic>;
+        materiaReal = dataLibro['materia'] ?? 'Sin Materia'; 
+      }
+
       final nuevoPrestamo = Prestamo(
         id: '', // Firebase
         correoSolicitante: correoUsuario,
@@ -54,7 +63,7 @@ class BibliotecaService {
         materialId: libro.id,
         tituloMaterial: libro.titulo,
         carrera: carreraFinal,     
-        materia: libro.materia,
+        materia: materiaReal,
         estado: 'solicitado',
       );
 
