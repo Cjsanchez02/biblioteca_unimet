@@ -37,7 +37,12 @@ class BibliotecaService {
         String rolUsuario = userData['rol'] ?? 'estudiante';
 
         // Aplicamos tu condicional:
-        if (rolUsuario == 'empleado' || rolUsuario == 'profesor') {
+        if (rolUsuario == 'empleado' || 
+            rolUsuario == 'profesor' || 
+            rolUsuario == 'bibliotecario' || 
+            rolUsuario == 'administrador') {
+            
+          carreraFinal = rolUsuario;
           carreraFinal = rolUsuario; // Si es empleado o profesor, se coloca eso
         } else {
           // Si es estudiante, tomamos su carrera de la base de datos

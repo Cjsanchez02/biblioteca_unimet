@@ -57,11 +57,34 @@ class EstadisticasViewModel extends ChangeNotifier {
 
     for (var doc in snapshot.docs) {
       final data = doc.data() as Map<String, dynamic>;
-      
-      // Elegimos por qué campo agrupar dependiendo de lo que elija el bibliotecario
-      String clave = _modoActual == ModoEstadistica.solicitudesCarrera 
-          ? (data['carrera'] ?? 'Sin Carrera') 
-          : (data['materia'] ?? 'Sin Materia');
+      String clave = '';
+
+      if (_modoActual == ModoEstadistica.solicitudesCarrera) {
+        // Obtenemos la carrera cruda de la base de datos
+        String carreraCruda = data['carrera']?.toString().trim() ?? 'Sin Carrera';
+        String carreraNormalizada = carreraCruda;
+
+        // 1. Agrupar Empleados y Profesores
+        if (carreraCruda.toLowerCase() == 'profesor' || 
+            carreraCruda.toLowerCase() == 'empleado' || 
+            carreraCruda.toLowerCase() == 'bibliotecario' || 
+            carreraCruda.toLowerCase() == 'administrador') {
+          carreraNormalizada = 'Empleado';
+        }
+        // 2. Limpiar duplicados de "No especificada" / "Sin carrera"
+        else if (carreraCruda.toLowerCase() == 'sin carrera registrada' || 
+                 carreraCruda.toLowerCase() == 'sin carrera' || 
+                 carreraCruda.isEmpty) {
+          carreraNormalizada = 'No especificada';
+        }
+
+        clave = carreraNormalizada;
+
+      } else {
+        // Lógica original para Materia
+        clave = data['materia']?.toString().trim() ?? 'Sin Materia';
+        if (clave.isEmpty) clave = 'Sin Materia';
+      }
       
       conteo[clave] = (conteo[clave] ?? 0) + 1;
       total++;
@@ -78,13 +101,14 @@ class EstadisticasViewModel extends ChangeNotifier {
 
     for (int i = 0; i < ordenados.length; i++) {
       double porcentaje = (ordenados[i].value / total) * 100;
-      if (i < 5) {
+      if (i < 5) { // Solo muestra los 5 más grandes, el resto va a "Otros"
         finales[ordenados[i].key] = double.parse(porcentaje.toStringAsFixed(1));
       } else {
         sumaOtros += porcentaje;
       }
     }
-    if (sumaOtros > 0) finales['Otros'] = double.parse(sumaOtros.toStringAsFixed(1));
+    
+    if (sumaOtros > 0) finales['OTRO'] = double.parse(sumaOtros.toStringAsFixed(1)); 
     _datosProcesados = finales;
   }
 
