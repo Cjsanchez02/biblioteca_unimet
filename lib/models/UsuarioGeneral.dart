@@ -15,16 +15,16 @@ class UsuarioGeneral {
       return userCredential.user;
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
-        print('No existe un usuario con ese correo.');
+        ('No existe un usuario con ese correo.');
       } else if (e.code == 'wrong-password') {
-        print('La contraseña es incorrecta.');
+        ('La contraseña es incorrecta.');
       } else if (e.code == 'invalid-email') {
-        print('El formato del correo no es válido.');
+        ('El formato del correo no es válido.');
       }
 
       rethrow;
     } catch (e) {
-      print('Error inesperado: $e');
+      ('Error inesperado: $e');
       return null;
     }
   }
@@ -44,8 +44,9 @@ class UsuarioGeneral {
   Future<User?> registrarUsuario(
     String email,
     String password,
-    String nombre,
-  ) async {
+    String nombre, {
+    String rol = 'estudiante', // Param. opcional, estudiante por defecto
+  }) async {
     try {
       UserCredential userCredential = await _auth
           .createUserWithEmailAndPassword(email: email, password: password);
@@ -61,13 +62,13 @@ class UsuarioGeneral {
             .set({
               'nombre': nombre,
               'email': email,
-              'rol': 'estudiante', // Rol por defecto
+              'rol': rol, 
             });
       }
 
       return userCredential.user;
     } on FirebaseAuthException catch (e) {
-      print("Error de Firebase en Registro: ${e.code}");
+      ('Error de Firebase en Registro: ${e.code}');
       rethrow;
     } catch (e) {
       return null;
@@ -86,7 +87,7 @@ class UsuarioGeneral {
       }
       return 'estudiante';
     } catch (e) {
-      print("Error obteniendo rol: $e");
+      ("Error obteniendo rol: $e");
       return 'estudiante';
     }
   }

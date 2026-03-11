@@ -1,4 +1,5 @@
 import 'package:biblioteca_unimet/ui/views/admin_catalog_view.dart';
+import 'package:biblioteca_unimet/ui/views/admin_user_view.dart';
 import 'package:biblioteca_unimet/ui/views/donation_view.dart';
 import 'package:flutter/material.dart';
 import 'package:biblioteca_unimet/viewmodels/auth_viewmodel.dart';
@@ -229,7 +230,12 @@ class AdminView extends StatelessWidget {
           },
         );
       }),
-      _actionBlock(Icons.manage_accounts, 'Administrar Usuarios', () {}),
+      _actionBlock(Icons.manage_accounts, 'Administrar Usuarios', () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const AdminUsersView()),
+        );
+      }),
       _actionBlock(Icons.bar_chart, 'Estadísticas', () {
         Navigator.push(
           context,

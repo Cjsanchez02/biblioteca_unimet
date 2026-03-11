@@ -25,17 +25,17 @@ class _DonationViewState extends State<DonationView> {
         setState(() => _monto = 0.0);
         return;
       }
-
+      String textoProcesado = text.replaceAll(',', '.');
       // Intentamos validar el número. 
       // Si contiene letras o más de un punto, tryParse devolverá null.
-      final double? valorValidado = double.tryParse(text);
+      final double? valorValidado = double.tryParse(textoProcesado);
 
       if (valorValidado == null) {
         // ERROR: El texto contiene caracteres no numéricos.
         // Eliminamos el último carácter introducido.
         final String filtrado = text.substring(0, text.length - 1);
         
-        // Usamos una micro-tarea para evitar errores de colisión en el renderizado
+        // evitar errores de renderizado
         Future.microtask(() {
           _montoController.value = TextEditingValue(
             text: filtrado,

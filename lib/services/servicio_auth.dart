@@ -8,7 +8,6 @@ class ServicioAuth {
     try {
       await _auth.signOut();
     } catch (e) {
-      // No imprimas, lanza la excepción para que la vista la capture
       throw Exception('Error al cerrar sesión en el servidor');
     }
   }

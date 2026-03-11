@@ -48,11 +48,11 @@ class _AdminMaterialFormState extends State<AdminMaterialForm> {
   String? _validarTexto(String? value) {
     if (value == null || value.isEmpty) return 'Campo obligatorio';
     if (RegExp(r'^[0-9]+$').hasMatch(value)) {
-      return 'No puede contener solo números';
+      return 'No puede contener sólo números';
     }
     if (RegExp(r'^[!@#\$%\^&\*\(\)_\+\-=\[\]\{\};:"\\|,.<>\/?]+$')
         .hasMatch(value)) {
-      return 'No puede contener solo caracteres especiales';
+      return 'No puede contener sólo caracteres especiales';
     }
     return null;
   }

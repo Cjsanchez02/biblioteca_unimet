@@ -58,7 +58,7 @@ class _RegisterViewState extends State<RegisterView> {
       return;
     }
 
-    if (!password.contains(RegExp(r'[!@#$%^&*()_,\¿/.?":{}|<>]'))) {
+    if (!password.contains(RegExp(r'[!@#$%^&*()_,\¿/.?"+-=:{}|<>]'))) {
       _mostrarMensaje("La contraseña debe incluir un carácter especial (ej: !@#)", Colors.red);
       return;
     }

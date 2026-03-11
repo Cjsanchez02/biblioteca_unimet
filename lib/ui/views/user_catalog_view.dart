@@ -208,20 +208,20 @@ class _UserCatalogViewState extends State<UserCatalogView> {
                     );
 
                     
-                    bool exito = await BibliotecaService().solicitarPrestamo(correo, libroSolicitado);
+                    String exito = await BibliotecaService().solicitarPrestamo(correo, libroSolicitado);
 
                     if (context.mounted) {
-                      if (exito) {
+                      if ( exito.startsWith("¡Préstamo solicitado con éxito!")) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('¡Libro solicitado con éxito! Revisa "Mis Préstamos"'),
+                           SnackBar(
+                            content: Text(exito),
                             backgroundColor: Colors.green,
                           ),
                         );
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Ya tienes el libro en préstamo o no hay stock disponible.'),
+                           SnackBar(
+                            content: Text(exito),
                             backgroundColor: Colors.red,
                           ),
                         );

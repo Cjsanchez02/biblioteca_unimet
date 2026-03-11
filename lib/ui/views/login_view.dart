@@ -27,7 +27,7 @@ class _LoginViewState extends State<LoginView> {
       return;
     }
 
-    if (!email.endsWith('@correo.unimet.edu.ve')) {
+    if (!email.endsWith('@correo.unimet.edu.ve') && !email.endsWith('@unimet.edu.ve')) {
       _notificar("Solo se permiten correos @correo.unimet.edu.ve", Colors.red);
       return;
     }
