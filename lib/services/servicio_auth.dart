@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class ServicioAuth {
@@ -11,4 +10,6 @@ class ServicioAuth {
       throw Exception('Error al cerrar sesión en el servidor');
     }
   }
+
+  
 }
