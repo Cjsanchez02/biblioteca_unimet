@@ -115,7 +115,7 @@ class _AdminUserFormViewState extends State<AdminUserFormView> {
       _snack("¡Cuenta creada con éxito!", Colors.green);
     } catch (e) {
       if (mounted) Navigator.pop(context); // Quitar diálogo de carga
-      _snack("Error: El correo ya existe o es inválido", Colors.red);
+      _mostrarErrorLocal("Error: El correo ya existe o es inválido");
     }
   }
 
@@ -128,7 +128,7 @@ class _AdminUserFormViewState extends State<AdminUserFormView> {
       if (mounted) Navigator.pop(context);
       _snack("Usuario eliminado permanentemente", Colors.red);
     } catch (e) {
-      _snack("Error al eliminar", Colors.red);
+      _mostrarErrorLocal("Error al eliminar");
     }
   }
 
