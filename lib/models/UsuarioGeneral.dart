@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class UsuarioGeneral {
@@ -58,11 +59,7 @@ class UsuarioGeneral {
         await FirebaseFirestore.instance
             .collection('usuarios')
             .doc(userCredential.user!.uid)
-            .set({
-              'nombre': nombre,
-              'email': email,
-              'rol': rol, 
-            });
+            .set({'nombre': nombre, 'email': email, 'rol': rol});
       }
 
       return userCredential.user;

@@ -22,7 +22,6 @@ class _EditProfileViewState extends State<EditProfileView> {
 
   bool _isLoading = true;
   bool _isSaving = false;
-  bool _isUploadingImage = false;
   String? _profileImageUrl;
   String _rol = 'estudiante'; // Por defecto
 
@@ -237,31 +236,6 @@ class _EditProfileViewState extends State<EditProfileView> {
                                   color: kDarkGray,
                                 )
                               : null,
-                        ),
-                        Positioned(
-                          bottom: 0,
-                          right: 0,
-                          child: GestureDetector(
-                            onTap: null, // Desactivado por ahora
-                            child: CircleAvatar(
-                              radius: 18,
-                              backgroundColor: kOrange,
-                              child: _isUploadingImage
-                                  ? const SizedBox(
-                                      width: 15,
-                                      height: 15,
-                                      child: CircularProgressIndicator(
-                                        color: Colors.white,
-                                        strokeWidth: 2,
-                                      ),
-                                    )
-                                  : const Icon(
-                                      Icons.camera_alt,
-                                      size: 20,
-                                      color: Colors.white,
-                                    ),
-                            ),
-                          ),
                         ),
                       ],
                     ),

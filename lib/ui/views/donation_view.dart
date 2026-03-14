@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class DonationView extends StatefulWidget {
   const DonationView({super.key});
@@ -58,8 +60,39 @@ class _DonationViewState extends State<DonationView> {
   }
 
   void _processPayment() async {
+    // Validacion basica antes de procesar
+    if (_monto <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Por favor ingresa un monto mayor a 0')),
+      );
+      return;
+    }
+
     setState(() => _isProcessing = true);
+    
+    // Simular el tiempo de conexion con el banco
     await Future.delayed(const Duration(seconds: 3));
+
+    // Guardar en Firebase
+    try {
+      final currentUsuario = FirebaseAuth.instance.currentUser;
+      if (currentUsuario != null) {
+        final Map<String, dynamic> nuevaDonacion = {
+            'monto': _monto,
+            'moneda': _monedaSeleccionada,
+            'fecha': DateTime.now().toIso8601String(),
+        };
+
+        await FirebaseFirestore.instance.collection('usuarios')
+          .doc(currentUsuario.uid)
+          .set({
+            'historialDonaciones': FieldValue.arrayUnion([nuevaDonacion])
+          }, SetOptions(merge: true));
+      }
+    } catch(e) {
+      // Si falla firebase solo mostramos un error pero en la vida real aqui abortariamos
+      debugPrint("Error al guardar donación: $e");
+    }
 
     if (!mounted) return;
     setState(() => _isProcessing = false);

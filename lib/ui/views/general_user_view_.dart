@@ -1,0 +1,448 @@
+import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:biblioteca_unimet/ui/views/user_catalog_view.dart';
+import 'package:biblioteca_unimet/viewmodels/sugerencia_viewmodel.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:biblioteca_unimet/ui/widgets/dialog_calification.dart';
+
+
+class HomeView extends StatefulWidget {
+  const HomeView({super.key});
+
+  static const Color kOrange = Color(0xFFF7941D);
+  static const Color kDarkGray = Color(0xFF333333);
+  static const Color kLightGray = Color(0xFFF4F4F4);
+
+  @override
+  State<HomeView> createState() => _HomeViewState();
+}
+
+class _HomeViewState extends State<HomeView> {
+  // Construye la estructura principal
+  final TextEditingController _sugerenciaController = TextEditingController();
+  final HomeViewModel _viewModel = HomeViewModel();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final usuarioActual = FirebaseAuth.instance.currentUser;
+      if (usuarioActual != null && usuarioActual.email != null) {
+        _verificarCalificacionesPendientes(context, usuarioActual.email!);
+      }
+    });
+  }
+
+  // La función que busca en Firebase y lanza el pop-up
+  Future<void> _verificarCalificacionesPendientes(BuildContext context, String correoUsuario) async {
+    final db = FirebaseFirestore.instance;
+    
+    // Buscamos los préstamos de este estudiante marcados como 'devuelto'
+    final pendientes = await db.collection('prestamos')
+        .where('correoSolicitante', isEqualTo: correoUsuario)
+        .where('estado', isEqualTo: 'devuelto')
+        .get();
+
+    for (var doc in pendientes.docs) {
+      final data = doc.data();
+      
+      // Verificamos si ya existe la bandera 'calificado' y si es true
+      bool yaFueCalificado = data.containsKey('calificado') ? data['calificado'] : false;
+
+      // Si no ha sido calificado, mostramos el Dialog
+      if (!yaFueCalificado && context.mounted) {
+        await showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (_) => DialogoCalificacion(
+            materialId: data['materialId'],
+            transaccionId: doc.id,
+            tituloLibro: data['tituloMaterial'],
+          ),
+        );
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _sugerenciaController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          bool isDesktop = constraints.maxWidth > 800;
+
+          return SingleChildScrollView(
+            child: Column(
+              children: [
+                _buildNavbar(isDesktop, context),
+                const SizedBox(height: 40),
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: isDesktop ? 80.0 : 20.0,
+                  ),
+                  child: Column(
+                    children: [
+                      _buildHeroSection(context, isDesktop),
+                      const SizedBox(height: 80),
+                      _buildActionSection(context, isDesktop),
+                      const SizedBox(height: 60),
+                      const Divider(thickness: 1, color: Colors.black12),
+                      const SizedBox(height: 60),
+                      _buildFooterSection(isDesktop),
+                      const SizedBox(height: 60),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),     
+    );
+  }
+
+  // Genera la barra de navegacion superior
+  Widget _buildNavbar(bool isDesktop, BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: isDesktop ? 80.0 : 20.0,
+        vertical: 20,
+      ),
+      color: Colors.white,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const Text(
+            'Biblioteca Unimet',
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              color: HomeView.kDarkGray,
+            ),
+          ),
+          if (isDesktop)
+            Row(
+              children: [
+
+                _navItem('Iniciar Sesión', () {
+                  Navigator.pushNamed(context, '/login');
+                }),
+              ],
+            )
+          else
+            const Icon(Icons.menu, color: HomeView.kDarkGray),
+        ],
+      ),
+    );
+  }
+
+  // Crea un enlace de texto individual para el menu
+  Widget _navItem(String title, VoidCallback onTap) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 30),
+      child: TextButton(
+        onPressed: onTap,
+        child: Text(
+          title,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+            color: HomeView.kDarkGray,
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Construye la seccion principal con el mensaje de bienvenida y la primera imagen
+  Widget _buildHeroSection(BuildContext context, bool isDesktop) {
+    Widget textContent = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        RichText(
+          text: const TextSpan(
+            style: TextStyle(
+              fontSize: 48,
+              fontWeight: FontWeight.bold,
+              color: HomeView.kDarkGray,
+              height: 1.1,
+            ),
+            children: [
+              TextSpan(text: 'Un Puente entre\nsiglos de '),
+              TextSpan(
+                text: 'saber',
+                style: TextStyle(color: HomeView.kOrange),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 20),
+        const Text(
+          'Accede a miles de recursos academicos, gestiona tus prestamos y contribuye con el desarrollo estudiantil a traves de donaciones.',
+          style: TextStyle(fontSize: 18, color: Colors.black54, height: 1.5),
+        ),
+        const SizedBox(height: 40),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: HomeView.kOrange,
+            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const UserCatalogView()),
+            );
+          },
+          child: const Text(
+            'Explorar Biblioteca',
+            style: TextStyle(fontSize: 18, color: Colors.white),
+          ),
+        ),
+      ],
+    );
+
+    Widget imageContent = Container(
+      height: 400,
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: HomeView.kLightGray,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: Image.asset(
+          'assets/images/biblioteca_2.jpg',
+          fit: BoxFit.cover,
+          width: double.infinity,
+          height: double.infinity,
+        ),
+      ),
+    );
+
+    if (isDesktop) {
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Expanded(flex: 5, child: textContent),
+          const SizedBox(width: 60),
+          Expanded(flex: 5, child: imageContent),
+        ],
+      );
+    } else {
+      return Column(
+        children: [imageContent, const SizedBox(height: 40), textContent],
+      );
+    }
+  }
+
+  // Renderiza el bloque de accion rapida (Catalogo)
+  Widget _buildActionSection(BuildContext context, bool isDesktop) {
+    Widget catalogAction = _actionBlock(Icons.menu_book, 'Catalogo', () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const UserCatalogView()),
+      );
+    });
+
+    return Center(
+      child: Container(
+        constraints: const BoxConstraints(maxWidth: 300),
+        child: catalogAction,
+      ),
+    );
+  }
+
+  // Crea el diseno individual de cada boton de accion con su icono
+  Widget _actionBlock(IconData icon, String title, VoidCallback onTap) {
+    return Column(
+      children: [
+        Icon(icon, size: 60, color: Colors.black),
+        const SizedBox(height: 20),
+        SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: HomeView.kOrange,
+              padding: const EdgeInsets.symmetric(vertical: 20),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            onPressed: onTap,
+            child: Text(
+              title,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // Construye la seccion inferior que contiene la segunda imagen
+  Widget _buildFooterSection(bool isDesktop) {
+    Widget imageContent = Container(
+      height: 350,
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: HomeView.kLightGray,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: Image.asset(
+          'assets/images/pasillobiblioteca.jpg',
+          fit: BoxFit.cover,
+          width: double.infinity,
+          height: double.infinity,
+        ),
+      ),
+    );
+
+    Widget formContent = Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(40),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                '¿Necesitas ayuda?',
+                style: TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  color: HomeView.kDarkGray,
+                ),
+              ),
+              const SizedBox(height: 10),
+              const Text(
+                'Habla con nuestro bibliotecario.',
+                style: TextStyle(fontSize: 16, color: Colors.black54),
+              ),
+              const SizedBox(height: 30),
+              // 1. La caja de texto conectada al controlador y con límite de 500
+              TextField(
+                controller: _sugerenciaController, // Conectamos el controlador
+                maxLines: 4,
+                maxLength: 500, // ¡Flutter pone el contador 0/500 automáticamente!
+                decoration: InputDecoration(
+                  hintText: 'Escribe tu mensaje aqui...',
+                  hintStyle: const TextStyle(color: Colors.black38),
+                  filled: true,
+                  fillColor: HomeView.kLightGray, // Ajusté la constante por si marca error
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              // 2. El botón conectado a tu ViewModel
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: HomeView.kOrange, // Ajusté la constante
+                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  onPressed: () async {
+                    // Llamamos a tu lógica limpia
+                    bool exito = await _viewModel.enviarSugerencia(
+                      _sugerenciaController.text, 
+                      context
+                    );
+                    
+                    // Si Firebase lo guardó bien, vaciamos la caja y avisamos
+                    if (exito) {
+                      _sugerenciaController.clear();
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('¡Sugerencia enviada con éxito!'),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
+                      }
+                    }
+                  },
+                  child: const Text(
+                    'Enviar mensaje',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        Positioned(
+          top: -20,
+          right: -20,
+          child: CircleAvatar(
+            radius: 30,
+            backgroundColor: HomeView.kDarkGray,
+            child: const Text(
+              '?',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+
+    if (isDesktop) {
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Expanded(flex: 5, child: imageContent),
+          const SizedBox(width: 60),
+          Expanded(flex: 5, child: formContent),
+        ],
+      );
+    } else {
+      return Column(
+        children: [formContent, const SizedBox(height: 40), imageContent],
+      );
+    }
+  }
+
+
+}
+

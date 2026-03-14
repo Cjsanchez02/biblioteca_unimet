@@ -1,6 +1,6 @@
 import 'package:biblioteca_unimet/ui/views/admin_catalog_view.dart';
 import 'package:biblioteca_unimet/ui/views/admin_user_view.dart';
-import 'package:biblioteca_unimet/ui/views/donation_view.dart';
+import 'package:biblioteca_unimet/ui/views/admin_donations_view.dart';
 import 'package:flutter/material.dart';
 import 'package:biblioteca_unimet/viewmodels/auth_viewmodel.dart';
 import 'package:biblioteca_unimet/ui/views/edit_profile_view.dart';
@@ -193,42 +193,10 @@ class AdminView extends StatelessWidget {
         );
       }),
       _actionBlock(Icons.bookmark_added, 'Gestión y Préstamos', () {}),
-      _actionBlock(Icons.volunteer_activism, 'Donaciones', () {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15),
-              ),
-              title: const Text('Qué acción desea realizar?'),
-              content: const Text(
-                'Está a punto de ser redirigido a la plataforma de PayPal para continuar con su donación.',
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text(
-                    'Cancelar',
-                    style: TextStyle(color: Colors.grey),
-                  ),
-                ),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: kOrange),
-                  onPressed: () {
-                    Navigator.pop(context);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const DonationView(),
-                      ),
-                    );
-                  },
-                  child: const Text('Continuar'),
-                ),
-              ],
-            );
-          },
+      _actionBlock(Icons.volunteer_activism, 'Ver Donaciones', () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const AdminDonationsView()),
         );
       }),
       _actionBlock(Icons.manage_accounts, 'Administrar Usuarios', () {
