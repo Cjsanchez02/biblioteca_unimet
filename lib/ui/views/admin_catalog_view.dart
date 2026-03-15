@@ -356,7 +356,7 @@ class _AdminCatalogoViewState extends State<AdminCatalogView> {
       ),
     );
   }
-  
+
   void _mostrarDetallesMaterial(Map<String, dynamic> material) {
   showModalBottomSheet(
     context: context,
@@ -420,7 +420,7 @@ class _AdminCatalogoViewState extends State<AdminCatalogView> {
                           Text("${material['calificacionPromedio'] ?? 0.0}", style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
                           const SizedBox(width: 15),
                           Icon(Icons.star, color: Colors.amber, size: 24),
-                          Text(" (${(material['totalVotos'] ?? 0)} votos)", style: const TextStyle(color: Colors.grey)),
+                          Text(" (${(material['totalVotos'] ?? 0)} votos totales)", style: const TextStyle(color: Colors.grey)),
                         ],
                       ),
 
