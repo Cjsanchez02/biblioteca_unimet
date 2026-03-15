@@ -6,7 +6,7 @@ import 'package:biblioteca_unimet/viewmodels/auth_viewmodel.dart';
 import 'package:biblioteca_unimet/ui/views/edit_profile_view.dart';
 import 'package:biblioteca_unimet/ui/views/estadisticas_view.dart';
 import 'package:biblioteca_unimet/ui/views/lista_sugerencias_view.dart';
-
+import 'package:biblioteca_unimet/ui/views/librarian_prestamos_view.dart';
 class AdminView extends StatelessWidget {
   const AdminView({super.key});
 
@@ -192,7 +192,12 @@ class AdminView extends StatelessWidget {
           MaterialPageRoute(builder: (context) => const AdminCatalogView()),
         );
       }),
-      _actionBlock(Icons.bookmark_added, 'Gestión y Préstamos', () {}),
+      _actionBlock(Icons.bookmark_added, 'Gestión y Préstamos', () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => LibrarianPrestamosView()),
+        );
+      }),
       _actionBlock(Icons.volunteer_activism, 'Ver Donaciones', () {
         Navigator.push(
           context,
