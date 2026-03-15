@@ -154,6 +154,16 @@ class _RegisterViewState extends State<RegisterView> {
                 Icons.lock_outline,
                 true,
               ),
+              const Padding(
+                padding: EdgeInsets.only(top: 8.0, left: 4.0),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    "La contraseña debe tener por lo menos 6 caracteres, una letra mayúscula y un carácter especial",
+                    style: TextStyle(fontSize: 12, color: Colors.grey),
+                  ),
+                ),
+              ),
               const SizedBox(height: 20),
 
               // Campo Confirmar Contrasena

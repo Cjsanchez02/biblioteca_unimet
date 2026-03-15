@@ -217,7 +217,7 @@ class _UserCatalogViewState extends State<UserCatalogView> {
               ],
             ),
           ),
-          // SECCIÓN DE ESTRELLAS Y BOTÓN DE SOLICITUD
+          // SECCION DE ESTRELLAS Y BOTON DE SOLICITUD
           Column(
             children: [
               Row(
@@ -233,66 +233,70 @@ class _UserCatalogViewState extends State<UserCatalogView> {
                 ),
               ),
               const SizedBox(height: 10),
-              // BOTÓN DE SOLICITAR (Solo habilitado si hay stock)
-              ElevatedButton(
-                onPressed: disponible
-                    ? () async {
-                        final usuarioActual = FirebaseAuth.instance.currentUser;
+              // BOTON DE SOLICITAR (Solo habilitado si hay stock y usuario logueado)
+              if (FirebaseAuth.instance.currentUser != null)
+                ElevatedButton(
+                  onPressed: disponible
+                      ? () async {
+                          final usuarioActual =
+                              FirebaseAuth.instance.currentUser;
 
-                        if (usuarioActual != null &&
-                            usuarioActual.email != null) {
-                          String correo = usuarioActual.email!;
+                          if (usuarioActual != null &&
+                              usuarioActual.email != null) {
+                            String correo = usuarioActual.email!;
 
-                          MaterialBibliografico libroSolicitado =
-                              MaterialBibliografico.fromMap(
-                                material,
-                                material['id'] ?? '',
-                              );
+                            MaterialBibliografico libroSolicitado =
+                                MaterialBibliografico.fromMap(
+                                  material,
+                                  material['id'] ?? '',
+                                );
 
-                          String exito = await BibliotecaService()
-                              .solicitarPrestamo(correo, libroSolicitado);
+                            String exito = await BibliotecaService()
+                                .solicitarPrestamo(correo, libroSolicitado);
 
-                          if (context.mounted) {
-                            if (exito.startsWith(
-                              "¡Préstamo solicitado con éxito!",
-                            )) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(exito),
-                                  backgroundColor: Colors.green,
-                                ),
-                              );
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(exito),
-                                  backgroundColor: Colors.red,
-                                ),
-                              );
+                            if (context.mounted) {
+                              if (exito.startsWith(
+                                "¡Préstamo solicitado con éxito!",
+                              )) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(exito),
+                                    backgroundColor: Colors.green,
+                                  ),
+                                );
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(exito),
+                                    backgroundColor: Colors.red,
+                                  ),
+                                );
+                              }
                             }
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  'Inicia sesión para pedir libros.',
+                                ),
+                                backgroundColor: Colors.orange,
+                              ),
+                            );
                           }
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Inicia sesión para pedir libros.'),
-                              backgroundColor: Colors.orange,
-                            ),
-                          );
                         }
-                      }
-                    : null, // Apagado si no hay stock
+                      : null, // Apagado si no hay stock
 
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: disponible ? kOrange : Colors.grey,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  textStyle: const TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: disponible ? kOrange : Colors.grey,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    textStyle: const TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
+                  child: Text(disponible ? "SOLICITAR" : "AGOTADO"),
                 ),
-                child: Text(disponible ? "SOLICITAR" : "AGOTADO"),
-              ),
             ],
           ),
         ],

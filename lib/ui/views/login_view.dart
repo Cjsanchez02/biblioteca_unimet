@@ -27,7 +27,8 @@ class _LoginViewState extends State<LoginView> {
       return;
     }
 
-    if (!email.endsWith('@correo.unimet.edu.ve') && !email.endsWith('@unimet.edu.ve')) {
+    if (!email.endsWith('@correo.unimet.edu.ve') &&
+        !email.endsWith('@unimet.edu.ve')) {
       _notificar("Solo se permiten correos @correo.unimet.edu.ve", Colors.red);
       return;
     }
@@ -89,118 +90,144 @@ class _LoginViewState extends State<LoginView> {
     return Scaffold(
       backgroundColor: Colors.white,
 
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
+      body: Stack(
+        children: [
+          // Contenido central existente
+          Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  //Logo
+                  Image.asset('assets/images/logometroshare.png', height: 120),
 
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              //Logo
-              Image.asset('assets/images/logometroshare.png', height: 120),
-
-              const SizedBox(height: 40),
-              const Text(
-                "Inicio de Sesión",
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 30),
-              const Text(
-                "Inicia sesión con tu correo UNIMET",
-                style: TextStyle(fontSize: 19, color: Color(0xFF666666)),
-              ),
-              const SizedBox(height: 30),
-
-              //Correo
-              TextField(
-                controller: _correoController,
-                keyboardType: TextInputType.emailAddress,
-                decoration: InputDecoration(
-                  labelText: 'Email',
-                  filled: true,
-                  fillColor: const Color(0xFFD9D9D9),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                    borderSide: BorderSide.none,
+                  const SizedBox(height: 40),
+                  const Text(
+                    "Inicio de Sesión",
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                   ),
-                  prefixIcon: const Icon(Icons.email_outlined),
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              //Contrasena
-              TextField(
-                controller: _passwordController,
-                obscureText: true,
-                decoration: InputDecoration(
-                  labelText: 'Contraseña',
-                  filled: true,
-                  fillColor: const Color(0xFFD9D9D9),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                    borderSide: BorderSide.none,
+                  const SizedBox(height: 30),
+                  const Text(
+                    "Inicia sesión con tu correo UNIMET",
+                    style: TextStyle(fontSize: 19, color: Color(0xFF666666)),
                   ),
-                ),
-              ),
+                  const SizedBox(height: 30),
 
-              const SizedBox(height: 40),
-              //Iniciar Sesion
-              ElevatedButton(
-                onPressed: _iniciarSesion,
-                style:
-                    ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFFF9500),
-
-                      foregroundColor: Colors.black,
-                      minimumSize: const Size(double.infinity, 60),
-                      shape: RoundedRectangleBorder(
+                  //Correo
+                  TextField(
+                    controller: _correoController,
+                    keyboardType: TextInputType.emailAddress,
+                    decoration: InputDecoration(
+                      labelText: 'Email',
+                      filled: true,
+                      fillColor: const Color(0xFFD9D9D9),
+                      border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10.0),
+                        borderSide: BorderSide.none,
                       ),
-                    ).copyWith(
-                      backgroundColor: WidgetStateProperty.resolveWith<Color?>((
-                        Set<WidgetState> states,
-                      ) {
-                        if (states.contains(WidgetState.hovered)) {
-                          return Colors.grey[300];
-                        }
-                        return const Color(0xFFFF9500);
-                      }),
+                      prefixIcon: const Icon(Icons.email_outlined),
                     ),
-                child: const Text(
-                  'Iniciar Sesión',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
                   ),
-                ),
-              ),
 
-              const SizedBox(height: 20),
+                  const SizedBox(height: 20),
 
-              TextButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const RegisterView(),
+                  //Contrasena
+                  TextField(
+                    controller: _passwordController,
+                    obscureText: true,
+                    decoration: InputDecoration(
+                      labelText: 'Contraseña',
+                      filled: true,
+                      fillColor: const Color(0xFFD9D9D9),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                        borderSide: BorderSide.none,
+                      ),
                     ),
-                  );
-                },
-                child: const Text(
-                  "¿No tienes cuenta? Regístrate",
-                  style: TextStyle(
-                    color: Color(0xFF666666),
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
                   ),
-                ),
+
+                  const SizedBox(height: 40),
+                  //Iniciar Sesion
+                  ElevatedButton(
+                    onPressed: _iniciarSesion,
+                    style:
+                        ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFFF9500),
+
+                          foregroundColor: Colors.black,
+                          minimumSize: const Size(double.infinity, 60),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                        ).copyWith(
+                          backgroundColor:
+                              WidgetStateProperty.resolveWith<Color?>((
+                                Set<WidgetState> states,
+                              ) {
+                                if (states.contains(WidgetState.hovered)) {
+                                  return Colors.grey[300];
+                                }
+                                return const Color(0xFFFF9500);
+                              }),
+                        ),
+                    child: const Text(
+                      'Iniciar Sesión',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const RegisterView(),
+                        ),
+                      );
+                    },
+                    child: const Text(
+                      "¿No tienes cuenta? Regístrate",
+                      style: TextStyle(
+                        color: Color(0xFF666666),
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
+          Positioned(
+            top: 40,
+            left: 10,
+            child: SafeArea(
+              // Asegura que no choque con notches en móviles
+              child: IconButton(
+                icon: const Icon(
+                  Icons.arrow_back,
+                  color: Color(0xFF666666),
+                ),
+                onPressed: () {
+                  // Si vienes de otra vista, hace pop. Si es la inicial, va a home.
+                  if (Navigator.canPop(context)) {
+                    Navigator.pop(context);
+                  } else {
+                    Navigator.pushReplacementNamed(context, '/home');
+                  }
+                },
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

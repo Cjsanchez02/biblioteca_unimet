@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:biblioteca_unimet/ui/widgets/card_format.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class DonationView extends StatefulWidget {
@@ -11,6 +13,10 @@ class DonationView extends StatefulWidget {
 
 class _DonationViewState extends State<DonationView> {
   bool _isProcessing = false;
+  final TextEditingController _tarjetaController = TextEditingController();
+  bool _esTarjetaValida = false;
+  bool _ocultarTarjeta = false;
+  final FocusNode _tarjetaFocusNode = FocusNode();
 
   // Variables para el monto y moneda
   final TextEditingController _montoController = TextEditingController();
@@ -21,41 +27,48 @@ class _DonationViewState extends State<DonationView> {
   @override
   void initState() {
     super.initState();
-    _montoController.addListener(() {
-      final String text = _montoController.text;
-      if (text.isEmpty) {
-        setState(() => _monto = 0.0);
-        return;
-      }
-      String textoProcesado = text.replaceAll(',', '.');
-      // Intentamos validar el número. 
-      // Si contiene letras o más de un punto, tryParse devolverá null.
-      final double? valorValidado = double.tryParse(textoProcesado);
 
-      if (valorValidado == null) {
-        // ERROR: El texto contiene caracteres no numéricos.
-        // Eliminamos el último carácter introducido.
-        final String filtrado = text.substring(0, text.length - 1);
-        
-        // evitar errores de renderizado
-        Future.microtask(() {
-          _montoController.value = TextEditingValue(
-            text: filtrado,
-            selection: TextSelection.collapsed(offset: filtrado.length),
-          );
-        });
-      } else {
-        // ÉXITO: Es un número válido. Actualizamos el estado para el botón.
-        setState(() {
-          _monto = valorValidado;
-        });
-      }
+    _tarjetaController.addListener(_validarTarjeta);
+
+    _montoController.addListener(_validarMonto);
+  }
+
+  void _validarTarjeta() {
+    setState(() {
+      _esTarjetaValida =
+          _tarjetaController.text.replaceAll(' ', '').length == 16;
     });
+  }
+
+  void _validarMonto() {
+    if (!mounted) return;
+
+    final String text = _montoController.text;
+    if (text.isEmpty) {
+      if (_monto != 0.0) setState(() => _monto = 0.0);
+      return;
+    }
+
+    // Reemplazamos coma por punto para el parsing
+    String textoProcesado = text.replaceAll(',', '.');
+    final double? valorValidado = double.tryParse(textoProcesado);
+
+    if (valorValidado != null && valorValidado != _monto) {
+      setState(() {
+        _monto = valorValidado;
+      });
+    }
   }
 
   @override
   void dispose() {
+    // Eliminamos los listeners antes de hacer el dispose para evitar fugas
+    _tarjetaController.removeListener(_validarTarjeta);
+    _montoController.removeListener(_validarMonto);
+
+    // Limpieza de controladores
     _montoController.dispose();
+    _tarjetaController.dispose();
     super.dispose();
   }
 
@@ -67,9 +80,19 @@ class _DonationViewState extends State<DonationView> {
       );
       return;
     }
+    if (!_esTarjetaValida) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'El formato de la tarjeta es incorrecto (deben ser 16 dígitos)',
+          ),
+        ),
+      );
+      return;
+    }
 
     setState(() => _isProcessing = true);
-    
+
     // Simular el tiempo de conexion con el banco
     await Future.delayed(const Duration(seconds: 3));
 
@@ -78,18 +101,19 @@ class _DonationViewState extends State<DonationView> {
       final currentUsuario = FirebaseAuth.instance.currentUser;
       if (currentUsuario != null) {
         final Map<String, dynamic> nuevaDonacion = {
-            'monto': _monto,
-            'moneda': _monedaSeleccionada,
-            'fecha': DateTime.now().toIso8601String(),
+          'monto': _monto,
+          'moneda': _monedaSeleccionada,
+          'fecha': DateTime.now().toIso8601String(),
         };
 
-        await FirebaseFirestore.instance.collection('usuarios')
-          .doc(currentUsuario.uid)
-          .set({
-            'historialDonaciones': FieldValue.arrayUnion([nuevaDonacion])
-          }, SetOptions(merge: true));
+        await FirebaseFirestore.instance
+            .collection('usuarios')
+            .doc(currentUsuario.uid)
+            .set({
+              'historialDonaciones': FieldValue.arrayUnion([nuevaDonacion]),
+            }, SetOptions(merge: true));
       }
-    } catch(e) {
+    } catch (e) {
       // Si falla firebase solo mostramos un error pero en la vida real aqui abortariamos
       debugPrint("Error al guardar donación: $e");
     }
@@ -241,36 +265,67 @@ class _DonationViewState extends State<DonationView> {
           const Align(
             alignment: Alignment.centerLeft,
             child: Text(
-              'Pagar con',
+              'Información de pago',
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
           ),
           const SizedBox(height: 10),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(15),
+              border: Border.all(
+                color: _esTarjetaValida ? Colors.blue : Colors.black12,
+                width: 1.5,
+              ),
             ),
-            child: const Row(
+            child: Column(
               children: [
-                Icon(Icons.credit_card, color: Colors.blue),
-                SizedBox(width: 15),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Visa •••• 4242',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                TextField(
+                  controller: _tarjetaController,
+                  focusNode: _tarjetaFocusNode,
+                  obscureText: _ocultarTarjeta,
+                  keyboardType: TextInputType.number,
+                  enableSuggestions: false,
+                  autocorrect: false,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.digitsOnly,
+                    LengthLimitingTextInputFormatter(16),
+                    CardFormatter(), // La clase que hicimos antes
+                  ],
+                  decoration: InputDecoration(
+                    hintText: "XXXX XXXX XXXX XXXX",
+                    labelText: "Número de Tarjeta",
+                    prefixIcon: const Icon(Icons.credit_card),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _ocultarTarjeta
+                            ? Icons.visibility_off
+                            : Icons.visibility,
+                        size: 20,
+                        color: Colors.grey,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _ocultarTarjeta = !_ocultarTarjeta;
+                        });
+                      },
                     ),
+                    border: InputBorder.none,
+                  ),
+                ),
+                const Divider(),
+                const Row(
+                  children: [
+                    Icon(Icons.security, size: 14, color: Colors.grey),
+                    SizedBox(width: 5),
                     Text(
-                      'Tarjeta de crédito principal',
-                      style: TextStyle(fontSize: 12, color: Colors.grey),
+                      "Los datos son privados",
+                      style: TextStyle(fontSize: 11, color: Colors.grey),
                     ),
                   ],
                 ),
-                Spacer(),
-                Icon(Icons.keyboard_arrow_right, color: Colors.grey),
               ],
             ),
           ),

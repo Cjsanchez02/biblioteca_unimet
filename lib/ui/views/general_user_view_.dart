@@ -33,11 +33,11 @@ class _HomeViewState extends State<HomeView> {
     });
   }
 
-  // La función que busca en Firebase y lanza el pop-up
+  // La funcion que busca en Firebase y lanza el pop-up
   Future<void> _verificarCalificacionesPendientes(BuildContext context, String correoUsuario) async {
     final db = FirebaseFirestore.instance;
     
-    // Buscamos los préstamos de este estudiante marcados como 'devuelto'
+    // Buscamos los prestamos de este estudiante marcados como 'devuelto'
     final pendientes = await db.collection('prestamos')
         .where('correoSolicitante', isEqualTo: correoUsuario)
         .where('estado', isEqualTo: 'devuelto')
@@ -346,16 +346,16 @@ class _HomeViewState extends State<HomeView> {
                 style: TextStyle(fontSize: 16, color: Colors.black54),
               ),
               const SizedBox(height: 30),
-              // 1. La caja de texto conectada al controlador y con límite de 500
+              // 1. La caja de texto conectada al controlador y con limite de 500
               TextField(
                 controller: _sugerenciaController, // Conectamos el controlador
                 maxLines: 4,
-                maxLength: 500, // ¡Flutter pone el contador 0/500 automáticamente!
+                maxLength: 500, // ¡Flutter pone el contador 0/500 automaticamente!
                 decoration: InputDecoration(
                   hintText: 'Escribe tu mensaje aqui...',
                   hintStyle: const TextStyle(color: Colors.black38),
                   filled: true,
-                  fillColor: HomeView.kLightGray, // Ajusté la constante por si marca error
+                  fillColor: HomeView.kLightGray, // Ajuste la constante por si marca error
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                     borderSide: BorderSide.none,
@@ -364,25 +364,25 @@ class _HomeViewState extends State<HomeView> {
               ),
               const SizedBox(height: 20),
 
-              // 2. El botón conectado a tu ViewModel
+              // 2. El boton conectado a tu ViewModel
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: HomeView.kOrange, // Ajusté la constante
+                    backgroundColor: HomeView.kOrange, // Ajuste la constante
                     padding: const EdgeInsets.symmetric(vertical: 20),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
                   onPressed: () async {
-                    // Llamamos a tu lógica limpia
+                    // Llamamos a tu logica limpia
                     bool exito = await _viewModel.enviarSugerencia(
                       _sugerenciaController.text, 
                       context
                     );
                     
-                    // Si Firebase lo guardó bien, vaciamos la caja y avisamos
+                    // Si Firebase lo guardo bien, vaciamos la caja y avisamos
                     if (exito) {
                       _sugerenciaController.clear();
                       if (context.mounted) {
