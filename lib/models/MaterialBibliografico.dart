@@ -34,10 +34,10 @@ class MaterialBibliografico {
       id: documentId,
       titulo: map['titulo'] ?? '',
       autor: map['autor'] ?? '',
-      materia: map['categoria'] ?? 'OTRO',
+      materia: map['materia'] ?? 'OTRO',
       stock: map['stock'] ?? 0,
       calificacionPromedio: (map['calificacionPromedio'] ?? 0.0).toDouble(),
-      totalVotos: map['totalVotos'] ?? 0,
+      totalVotos: (map['totalVotos'] as num?)?.toInt() ?? 0,
       vecesSolicitado: map['vecesSolicitado'] ?? 0,
     );
   }

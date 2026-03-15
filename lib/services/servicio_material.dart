@@ -35,10 +35,20 @@ class servicioMaterial {
               'materia': data['materia'] ?? 'General',
               'tipo': data['tipo'] ?? 'Libro',
               'stock': data['stock'] ?? 0,
-              'calificacionPromedio': (data['calificacionPromedio'] ?? 0.0)
-                  .toDouble(),
+              'calificacionPromedio': (data['calificacionPromedio'] ?? 0.0).toDouble(),
+              'totalVotos': data['totalVotos'] ?? 0,
             };
           }).toList(),
         );
+  }
+
+  Future<bool> existeTitulo(String titulo, {String? excluirId}) async {
+    final query = await _db.collection(_coleccion).get(const GetOptions(source: Source.server));;
+    String tituloNormalizado = titulo.trim().toLowerCase();
+    return query.docs.any((doc) {
+      if (excluirId != null && doc.id == excluirId) return false;
+      String tituloEnFirebase = (doc.data()['titulo'] ?? 'Sin título').toString().trim().toLowerCase();
+      return tituloEnFirebase == tituloNormalizado;
+    });
   }
 }

@@ -1,5 +1,6 @@
 import 'package:biblioteca_unimet/viewmodels/material_viewmodel.dart';
 import 'package:flutter/material.dart';
+import 'dart:async';
 
 enum ModoFormulario { agregar, editar, eliminar }
 
@@ -27,6 +28,9 @@ class _AdminMaterialFormState extends State<AdminMaterialForm> {
   final _stockCtrl = TextEditingController();
   String _tipoSeleccionado = 'Libro';
 
+  bool _cargando = false; // Para mostrar un indicador de carga
+  String? _errorDuplicado; // Para mostrar error específico de título duplicado
+
   @override
   void initState() {
     super.initState();
@@ -50,8 +54,9 @@ class _AdminMaterialFormState extends State<AdminMaterialForm> {
     if (RegExp(r'^[0-9]+$').hasMatch(value)) {
       return 'No puede contener sólo números';
     }
-    if (RegExp(r'^[!@#\$%\^&\*\(\)_\+\-=\[\]\{\};:"\\|,.<>\/?]+$')
-        .hasMatch(value)) {
+    if (RegExp(
+      r'^[!@#\$%\^&\*\(\)_\+\-=\[\]\{\};:"\\|,.<>\/?]+$',
+    ).hasMatch(value)) {
       return 'No puede contener sólo caracteres especiales';
     }
     return null;
@@ -79,7 +84,12 @@ class _AdminMaterialFormState extends State<AdminMaterialForm> {
               // DROPDOWN PARA TIPO
               DropdownButtonFormField<String>(
                 initialValue:
-                    ['Libro','Guía','Revista','Tesis'].contains(_tipoSeleccionado)
+                    [
+                      'Libro',
+                      'Guía',
+                      'Revista',
+                      'Tesis',
+                    ].contains(_tipoSeleccionado)
                     ? _tipoSeleccionado
                     : 'Libro',
                 items: ['Libro', 'Guía', 'Revista', 'Tesis']
@@ -94,9 +104,29 @@ class _AdminMaterialFormState extends State<AdminMaterialForm> {
               ),
               const SizedBox(height: 10),
               _buildTextField(_tituloCtrl, 'Título', _validarTexto, esEliminar),
+              if (_errorDuplicado !=
+                  null) // Si hay error de título duplicado, se muestra debajo del campo
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  child: Text(
+                    _errorDuplicado!,
+                    style: const TextStyle(color: Colors.red, fontSize: 12),
+                  ),
+                ),
               _buildTextField(_autorCtrl, 'Autor', _validarTexto, esEliminar),
-              _buildTextField(_materiaCtrl, 'Materia', _validarTexto, esEliminar),
-              _buildTextField(_stockCtrl, 'Stock', _validarStock, esEliminar, keyboard: TextInputType.number),
+              _buildTextField(
+                _materiaCtrl,
+                'Materia',
+                _validarTexto,
+                esEliminar,
+              ),
+              _buildTextField(
+                _stockCtrl,
+                'Stock',
+                _validarStock,
+                esEliminar,
+                keyboard: TextInputType.number,
+              ),
             ],
           ),
         ),
@@ -110,13 +140,22 @@ class _AdminMaterialFormState extends State<AdminMaterialForm> {
           style: ElevatedButton.styleFrom(
             backgroundColor: esEliminar ? Colors.red : const Color(0xFFF7941D),
           ),
-          onPressed: _procesarAccion,
-          child: Text(
-            widget.modo == ModoFormulario.eliminar
-                ? 'Confirmar Eliminar'
-                : 'Guardar',
-            style: const TextStyle(color: Colors.black),
-          ),
+          onPressed: _cargando ? null : _procesarAccion,
+          child: _cargando
+              ? const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  ),
+                )
+              : Text(
+                  widget.modo == ModoFormulario.eliminar
+                      ? 'Confirmar Eliminar'
+                      : 'Guardar',
+                  style: const TextStyle(color: Colors.black),
+                ),
         ),
       ],
     );
@@ -139,32 +178,64 @@ class _AdminMaterialFormState extends State<AdminMaterialForm> {
   }
 
   void _procesarAccion() async {
+    if (_cargando) return; // Evita múltiples clics
     if (widget.modo != ModoFormulario.eliminar &&
         !_formKey.currentState!.validate())
       return;
 
+    setState(() => _cargando = true);
     final vm = MaterialViewModel();
-    bool exito = false;
 
-    if (widget.modo == ModoFormulario.eliminar) {
-      await vm.borrarMaterial(widget.materialExistente!['id']);
-      exito = true;
-    } else {
-      exito = await vm.guardarMaterial(
-        id: widget.materialExistente?['id'],
-        tipo: _tipoSeleccionado,
-        titulo: _tituloCtrl.text,
-        autor: _autorCtrl.text,
-        materia: _materiaCtrl.text,
-        stock: int.parse(_stockCtrl.text),
-      );
-    }
+    try {
+      final String tituloNormalizado = _tituloCtrl.text.trim();
+      if (widget.modo != ModoFormulario.eliminar) {
+        bool esDuplicado = await vm.validarDuplicado(
+          tituloNormalizado,
+          id: widget.materialExistente?['id'],
+        );
 
-    if (exito && mounted) {
-      Navigator.pop(context);
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Acción realizada con éxito")));
+        if (esDuplicado && mounted) {
+          setState(() {
+            _errorDuplicado = "Este título ya existe"; // Guardamos el error
+            _cargando =
+                false; // Detenemos la carga para que el usuario pueda corregir
+          });
+          Timer(const Duration(seconds: 3), () {
+            if (mounted) {
+              setState(() {
+                _errorDuplicado = null;
+              });
+            }
+          });
+
+          return;
+        }
+      }
+
+      bool exito = false;
+
+      if (widget.modo == ModoFormulario.eliminar) {
+        await vm.borrarMaterial(widget.materialExistente!['id']);
+        exito = true;
+      } else {
+        exito = await vm.guardarMaterial(
+          id: widget.materialExistente?['id'],
+          tipo: _tipoSeleccionado,
+          titulo: _tituloCtrl.text.trim(),
+          autor: _autorCtrl.text.trim(),
+          materia: _materiaCtrl.text.trim(),
+          stock: int.parse(_stockCtrl.text),
+        );
+      }
+
+      if (exito && mounted) {
+        Navigator.pop(context);
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text("Acción realizada con éxito")));
+      }
+    } finally {
+      if (mounted) setState(() => _cargando = false);
     }
   }
 }

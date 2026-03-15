@@ -75,4 +75,9 @@ class MaterialViewModel extends ChangeNotifier {
   Future<void> borrarMaterial(String id) async {
     await _service.eliminarMaterial(id);
   }
+
+  Future<bool> validarDuplicado(String titulo, {String? id}) async {
+    // El VM delega la responsabilidad al servicio
+    return await _service.existeTitulo(titulo, excluirId: id);
+  }
 }
