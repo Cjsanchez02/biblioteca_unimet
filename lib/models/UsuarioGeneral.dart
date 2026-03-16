@@ -71,6 +71,7 @@ class UsuarioGeneral {
               'nombre': nombre,
               'email': email,
               'rol': 'estudiante', // Rol por defecto
+              'fechafinbloqueo': null, // Campo para bloqueo por retrasos
             });
       }
 

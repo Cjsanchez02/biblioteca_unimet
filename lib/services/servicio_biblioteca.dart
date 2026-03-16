@@ -8,6 +8,19 @@ class BibliotecaService {
   // Funcion para solicitar un préstamo
   Future<String> solicitarPrestamo(String correoUsuario, MaterialBibliografico libro) async {
     try {
+      //Verificación de multa 
+      final DateTime ahora = DateTime.now();
+      final userQuery = await _db.collection('usuarios')
+        .where('email', isEqualTo: correoUsuario).get();
+    
+    if (userQuery.docs.isNotEmpty) {
+      var userData = userQuery.docs.first.data();
+      Timestamp? fechaFin = userData['fechafinbloqueo'];
+      if (fechaFin != null && fechaFin.toDate().isAfter(ahora)) {
+        DateTime fin = fechaFin.toDate();
+        return "Cuenta suspendida hasta el regresar  por retrasos previos.";
+      }
+    }
       // Verificación de préstamo activo para el mismo material
       final prestamosActivos = await _db.collection('prestamos')
           .where('correoSolicitante', isEqualTo: correoUsuario) // Filtramos por su correo
@@ -98,7 +111,7 @@ class BibliotecaService {
     }
     return false;
   } catch (e) {
-    print("Error al extender: $e");
+    
     return false;
   }
 }
@@ -110,10 +123,10 @@ class BibliotecaService {
         'estado': 'aprobado',
         
       });
-      print("¡Préstamo aprobado!");
+      
       return true;
     } catch (e) {
-      print("Error al aprobar préstamo: $e");
+    
       return false;
     }
   }
@@ -121,23 +134,41 @@ class BibliotecaService {
 
   Future<bool> devolverPrestamo(String prestamoId, String materialId) async {
     try {
-      WriteBatch batch = _db.batch();
+      
+      DocumentSnapshot prestamoDoc = await _db.collection('prestamos').doc(prestamoId).get();
+      if (!prestamoDoc.exists) return false;
+
+      final prestamoData = prestamoDoc.data() as Map<String, dynamic>;
+      String? correo = prestamoData['correoSolicitante'];
 
       
+      WriteBatch batch = _db.batch();
+
+     
       DocumentReference prestamoRef = _db.collection('prestamos').doc(prestamoId);
       batch.update(prestamoRef, {'estado': 'devuelto'});
 
-      
+  
       DocumentReference libroRef = _db.collection('material_academico').doc(materialId);
       batch.update(libroRef, {'stock': FieldValue.increment(1)});
 
-      
-      await batch.commit();
-      
-      print("¡Libro devuelto con éxito y stock actualizado!");
+     
+      if (correo != null) {
+        final userQuery = await _db.collection('usuarios')
+            .where('email', isEqualTo: correo)
+            .get();
+
+        if (userQuery.docs.isNotEmpty) {
+          final usuarioId = userQuery.docs.first.id;
+          DocumentReference usuarioRef = _db.collection('usuarios').doc(usuarioId);
+        
+          batch.update(usuarioRef, {'fechafinbloqueo': null});
+        }
+      }
+      await batch.commit();      
       return true;
     } catch (e) {
-      print("Error al devolver el libro: $e");
+      
       return false;
     }
   }
@@ -158,5 +189,57 @@ class BibliotecaService {
       return false;
     }
   }
-  
+  Future <String> perdonarMulta(String usuarioId) async {
+    try {
+      await _db.collection('usuarios').doc(usuarioId).update({
+        'fechafinbloqueo': null,
+      });
+      return "Multa perdonada con éxito."; 
+    } catch (e) {
+      return "Error al perdonar multa."; 
+    }
+  }
+  Future<void> escanearMultados() async {
+    try {
+      
+      final activos = await _db
+          .collection('prestamos')
+          .where('estado', isEqualTo: 'aprobado')
+          .get();
+
+      final DateTime ahora = DateTime.now(); 
+      for (var doc in activos.docs) {
+        final data = doc.data();
+        final correo = data['correoSolicitante'];
+        Timestamp? fechaDevolucionTS = data['fechaDevolucion'];
+
+        if (fechaDevolucionTS != null && fechaDevolucionTS.toDate().isBefore(ahora)) {
+          
+          if (correo != null) {
+            final userQuery = await _db
+                .collection('usuarios')
+                .where('email', isEqualTo: correo)
+                .get();
+
+            if (userQuery.docs.isNotEmpty) {
+              final usuarioId = userQuery.docs.first.id;
+              final userData = userQuery.docs.first.data();
+              
+            
+              Timestamp? fechaFin = userData['fechafinbloqueo'];
+
+              if (fechaFin == null || fechaFin.toDate().year != 2099) {
+                await _db.collection('usuarios').doc(usuarioId).update({
+                  'fechafinbloqueo': Timestamp.fromDate(DateTime(2099, 12, 31)),
+                });
+                print("¡Usuario $correo multado con éxito por Flutter!");
+              }
+            }
+          }
+        }
+      }
+    } catch (e) {
+      print("Error al escanear multados: $e");
+    }
+  }
 }

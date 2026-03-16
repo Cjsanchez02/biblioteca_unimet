@@ -204,7 +204,7 @@ class _UserCatalogViewState extends State<UserCatalogView> {
 
                     
                     String exito = await BibliotecaService().solicitarPrestamo(correo, libroSolicitado);
-
+                    
                     if (context.mounted) {
                       if ( exito.startsWith("¡Préstamo solicitado con éxito!")) {
                         ScaffoldMessenger.of(context).showSnackBar(

@@ -18,7 +18,25 @@ class _EditProfileViewState extends State<EditProfileView> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
-  final TextEditingController _carreraController = TextEditingController();
+  // Borra _carreraController y pon esto:
+  String? _selectedCarrera;
+  
+  // Lista de carreras (Puedes agregar o quitar las que necesites)
+  final List<String> _carrerasDisponibles = [
+    'Ingeniería de Sistemas',
+    'Ingeniería de Producción',
+    'Ingeniería Civil',
+    'Ingeniería Mecánica',
+    'Ingeniería Química',
+    'Ciencias Administrativas',
+    'Contaduría Pública',
+    'Economía Empresarial',
+    'Idiomas Modernos',
+    'Psicología',
+    'Derecho',
+    'Matemáticas Industriales',
+    'Educación'
+  ];
   final TextEditingController _passwordController = TextEditingController();
 
   bool _isLoading = true;
@@ -38,7 +56,6 @@ class _EditProfileViewState extends State<EditProfileView> {
     _nameController.dispose();
     _emailController.dispose();
     _phoneController.dispose();
-    _carreraController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
@@ -68,8 +85,16 @@ class _EditProfileViewState extends State<EditProfileView> {
               if (data['nombre'] != null) _nameController.text = data['nombre'];
 
               _phoneController.text = data['telefono'] ?? '';
-              _carreraController.text = data['carrera'] ?? '';
+              
+              String carreraGuardada = data['carrera'] ?? '';
+              if (_carrerasDisponibles.contains(carreraGuardada)) {
+                _selectedCarrera = carreraGuardada;
+              } else {
+                _selectedCarrera = null;
+              }
+              
               _profileImageUrl = data['fotoUrl'];
+              _rol = data['rol'] ?? 'estudiante';
               _rol = data['rol'] ?? 'estudiante';
             }
 
@@ -168,7 +193,7 @@ class _EditProfileViewState extends State<EditProfileView> {
             .set({
               'nombre': _nameController.text.trim(),
               'telefono': _phoneController.text.trim(),
-              'carrera': _carreraController.text.trim(),
+              'carrera': _selectedCarrera ?? 'No especificada',
             }, SetOptions(merge: true));
 
         //  cambio de nombre lo actualizamos en su perfil de Auth
@@ -301,7 +326,7 @@ class _EditProfileViewState extends State<EditProfileView> {
                   ),
                   const SizedBox(height: 20),
                   if (_rol == 'estudiante') ...[
-                    _buildTextField("Carrera", _carreraController),
+                    _buildCarreraDropdown(),                    
                     const SizedBox(height: 20),
                   ],
                   _buildTextField(
@@ -377,6 +402,47 @@ class _EditProfileViewState extends State<EditProfileView> {
               borderSide: BorderSide.none,
             ),
           ),
+        ),
+      ],
+    );
+  }
+  /// Para crear la lista desplegable de carreras
+  Widget _buildCarreraDropdown() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          "Carrera",
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+            color: kDarkGray,
+          ),
+        ),
+        const SizedBox(height: 8),
+        DropdownButtonFormField<String>(
+          value: _selectedCarrera,
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: const Color(0xFFF4F4F4),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide.none,
+            ),
+          ),
+          hint: const Text("Selecciona tu carrera"),
+          icon: const Icon(Icons.arrow_drop_down, color: kOrange),
+          items: _carrerasDisponibles.map((String carrera) {
+            return DropdownMenuItem<String>(
+              value: carrera,
+              child: Text(carrera, style: const TextStyle(fontSize: 14)),
+            );
+          }).toList(),
+          onChanged: (String? newValue) {
+            setState(() {
+              _selectedCarrera = newValue;
+            });
+          },
         ),
       ],
     );
