@@ -188,26 +188,6 @@ class _HomeViewState extends State<HomeView> {
           'Accede a miles de recursos academicos, gestiona tus prestamos y contribuye con el desarrollo estudiantil a traves de donaciones.',
           style: TextStyle(fontSize: 18, color: Colors.black54, height: 1.5),
         ),
-        const SizedBox(height: 40),
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: HomeView.kOrange,
-            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const UserCatalogView()),
-            );
-          },
-          child: const Text(
-            'Explorar Biblioteca',
-            style: TextStyle(fontSize: 18, color: Colors.white),
-          ),
-        ),
       ],
     );
 
